@@ -23,7 +23,6 @@ body:
         - chore
         - hotfix
         - docs
-    required: true
 
   - type: input
     id: description
