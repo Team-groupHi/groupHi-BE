@@ -12,13 +12,18 @@ body:
     validations:
       required: true
 
-  - type: input
-    id: branch
+  - type: dropdown
+    id: branch_type
     attributes:
-      label: "🌳 브랜치명 (Branch)"
-      description: "영어로 브랜치명을 작성해주세요"
-    validations:
-      required: true
+      label: "Branch Type"
+      options:
+        - feat
+        - fix
+        - refactor
+        - chore
+        - hotfix
+        - docs
+    required: true
 
   - type: input
     id: description
