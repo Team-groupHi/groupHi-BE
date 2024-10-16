@@ -66,11 +66,12 @@ jobs:
         with:
           ref: dev
 
-      - name: Create branch with Jira and GitHub issue numbers
+      - name: Create branch with Jira, Branch Type, and GitHub issue numbers
         run: |
           JIRA_ISSUE="${{ steps.create.outputs.issue }}"
+          BRANCH_TYPE="${{ steps.issue-parser.outputs.branch_type }}"
           GITHUB_ISSUE="${{ github.event.issue.number }}"
-          BRANCH_NAME="${JIRA_ISSUE}-feat/${GITHUB_ISSUE}"
+          BRANCH_NAME="${JIRA_ISSUE}-${BRANCH_TYPE}/${GITHUB_ISSUE}"
           git checkout -b "${BRANCH_NAME}"
           git push origin "${BRANCH_NAME}"
 
