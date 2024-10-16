@@ -66,15 +66,6 @@ jobs:
         with:
           ref: dev
 
-      - name: Log Issue Parser
-        run: |
-          echo "Parsed Issue JSON: ${{ steps.issue-parser.outputs.jsonString }}"
-
-      - name: Extract Branch Type
-        run: |
-          branch_type=$(echo '${{ steps.issue-parser.outputs.jsonString }}' | jq -r '.branch_type')
-          echo "Branch Type from JSON: $branch_type"
-
       - name: Create branch with Jira, Branch Type, and GitHub issue numbers
         run: |
           JIRA_ISSUE="${{ steps.create.outputs.issue }}"
@@ -86,7 +77,7 @@ jobs:
           echo "Branch Type: $BRANCH_TYPE"
           echo "GitHub Issue: $GITHUB_ISSUE"
 
-          BRANCH_NAME="${JIRA_ISSUE}-${BRANCH_TYPE}/${GITHUB_ISSUE}"
+          BRANCH_NAME="[${JIRA_ISSUE}]${BRANCH_TYPE}/${GITHUB_ISSUE}"
           git checkout -b "${BRANCH_NAME}"
           git push origin "${BRANCH_NAME}"
 
