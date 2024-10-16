@@ -77,7 +77,7 @@ jobs:
           echo "Branch Type: $BRANCH_TYPE"
           echo "GitHub Issue: $GITHUB_ISSUE"
 
-          BRANCH_NAME="[${JIRA_ISSUE}]${BRANCH_TYPE}/${GITHUB_ISSUE}"
+          BRANCH_NAME="${JIRA_ISSUE}-${BRANCH_TYPE}/${GITHUB_ISSUE}"
           git checkout -b "${BRANCH_NAME}"
           git push origin "${BRANCH_NAME}"
 
