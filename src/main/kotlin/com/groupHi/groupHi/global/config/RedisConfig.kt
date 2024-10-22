@@ -1,4 +1,4 @@
-package com.groupHi.groupHi.config
+package com.groupHi.groupHi.global.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

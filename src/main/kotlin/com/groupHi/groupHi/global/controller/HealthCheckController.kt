@@ -1,14 +1,13 @@
-package com.groupHi.groupHi.domain.home
+package com.groupHi.groupHi.global.controller
 
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class HomeController {
+class HealthCheckController {
 
     @GetMapping
-    fun home(): String {
+    fun healthCheck(): String {
         return "Hello, World!"
     }
-
 }
