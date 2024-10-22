@@ -1,6 +1,6 @@
-package com.groupHi.groupHi.storage.game.repository
+package com.groupHi.groupHi.domain.game.repository
 
-import com.groupHi.groupHi.storage.game.entity.Game
+import com.groupHi.groupHi.domain.game.entity.Game
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
 

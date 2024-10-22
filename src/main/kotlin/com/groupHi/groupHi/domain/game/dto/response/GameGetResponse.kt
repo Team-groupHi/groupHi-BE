@@ -1,6 +1,6 @@
 package com.groupHi.groupHi.domain.game.dto.response
 
-import com.groupHi.groupHi.storage.game.entity.Game
+import com.groupHi.groupHi.domain.game.entity.Game
 
 data class GameGetResponse(
     val id: String,
