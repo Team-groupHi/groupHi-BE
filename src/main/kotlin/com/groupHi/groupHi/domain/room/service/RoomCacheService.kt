@@ -1,6 +1,5 @@
 package com.groupHi.groupHi.domain.room.service
 
-import com.groupHi.groupHi.domain.room.RoomStatus
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
@@ -37,6 +36,11 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { 
             }
         )
     }
+}
+
+enum class RoomStatus {
+    WAITING,
+    PLAYING
 }
 
 data class RoomResponse(
