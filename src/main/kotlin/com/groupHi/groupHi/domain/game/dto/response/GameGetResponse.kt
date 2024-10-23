@@ -14,7 +14,7 @@ data class GameGetResponse(
     companion object {
         fun from(game: Game): GameGetResponse {
             return GameGetResponse(
-                id = game.id!!,
+                id = game.id,
                 nameKr = game.nameKr,
                 nameEn = game.nameEn,
                 descriptionKr = game.descriptionKr,
