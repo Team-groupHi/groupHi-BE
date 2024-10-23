@@ -3,10 +3,7 @@ package com.groupHi.groupHi.domain.room.service
 import com.groupHi.groupHi.domain.game.dto.response.GameGetResponse
 import com.groupHi.groupHi.domain.game.repository.GameRepository
 import com.groupHi.groupHi.domain.room.dto.request.RoomCreateRequest
-import com.groupHi.groupHi.domain.room.dto.request.RoomResultCreateRequest
 import com.groupHi.groupHi.domain.room.dto.response.RoomGetResponse
-import com.groupHi.groupHi.domain.room.dto.response.RoomResultCreateResponse
-import com.groupHi.groupHi.domain.room.dto.response.RoomResultGetResponse
 import org.springframework.stereotype.Service
 
 @Service
@@ -40,16 +37,6 @@ class RoomService(
             hostName = room.hostName,
             players = room.players
         )
-    }
-
-    fun createRoomResult(roomId: String, request: RoomResultCreateRequest): RoomResultCreateResponse {
-        //TODO
-        return RoomResultCreateResponse()
-    }
-
-    fun getRoomResults(roomId: String): List<RoomResultGetResponse> {
-        //TODO
-        return listOf()
     }
 
     private fun generateRoomId(): String {

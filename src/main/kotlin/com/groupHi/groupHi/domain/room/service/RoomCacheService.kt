@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
 @Service
-class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) {
+class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { //TODO: 키값 상수화
 
     fun isRoomExist(id: String): Boolean {
         return redisTemplate.hasKey("room:$id")
