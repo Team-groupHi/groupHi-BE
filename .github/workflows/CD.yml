@@ -51,6 +51,6 @@ jobs:
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker pull ${{ secrets.DOCKER_USERNAME }}/grouphi:latest
             docker ps -q | xargs -r docker stop
-            docker run -d --log-driver=syslog -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/grouphi:latest
+            docker run -d --log-driver=syslog -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/grouphi:latest --spring.profiles.active=prod
             docker ps --filter 'status=exited' -q | xargs -r docker rm
             docker image prune -a -f
