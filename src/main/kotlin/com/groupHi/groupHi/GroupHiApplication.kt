@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class GroupHiApplication
 
 fun main(args: Array<String>) {
-	runApplication<GroupHiApplication>(*args)
+    runApplication<GroupHiApplication>(*args)
 }
