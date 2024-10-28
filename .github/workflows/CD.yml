@@ -17,17 +17,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Make application.yml
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
-
-      - name: Make application.yml
-        run: |
-          cd ./src/main/resources
-          touch ./application.yml
-          echo "${{ secrets.APPLICATION }}" > ./application.yml
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -52,6 +51,6 @@ jobs:
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker pull ${{ secrets.DOCKER_USERNAME }}/grouphi:latest
             docker ps -q | xargs -r docker stop
-            docker run -d --log-driver=syslog -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/grouphi:latest
+            docker run -d --log-driver=syslog -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/grouphi:latest --spring.profiles.active=prod
             docker ps --filter 'status=exited' -q | xargs -r docker rm
             docker image prune -a -f
