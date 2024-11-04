@@ -4,8 +4,10 @@ import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
+//TODO: 키값 상수화
+//TODO: 책임 명확하도록 리팩터링 필요
 @Service
-class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { //TODO: 키값 상수화
+class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) {
 
     fun isRoomExist(id: String): Boolean {
         return redisTemplate.hasKey(id)
@@ -27,7 +29,7 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { 
             id = id,
             status = room["status"] as RoomStatus,
             gameId = room["gameId"] as String,
-            hostName = room["host"] as String?,
+            hostName = room["hostName"] as String?,
             players = players.map { (name, isReady) ->
                 PlayerResponse(
                     name = name,
