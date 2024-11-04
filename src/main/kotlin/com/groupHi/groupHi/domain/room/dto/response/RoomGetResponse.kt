@@ -7,7 +7,7 @@ import com.groupHi.groupHi.domain.room.service.RoomStatus
 data class RoomGetResponse(
     val id: String,
     val status: RoomStatus,
+    val game: GameGetResponse,
     val hostName: String?,
-    val players: List<PlayerResponse>,
-    val game: GameGetResponse
+    val players: List<PlayerResponse>
 )
