@@ -20,7 +20,6 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { 
     fun getRoom(id: String): RoomResponse {
         val room = redisTemplate.opsForHash<String, Any>().entries(id)
         val players = redisTemplate.opsForHash<String, Any>().entries("$id:players")
-
         return RoomResponse(
             id = id,
             status = room["status"] as RoomStatus,
@@ -33,6 +32,47 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { 
                 )
             }
         )
+    }
+
+    fun enterRoom(id: String, name: String) {
+        val isHost = redisTemplate.opsForHash<String, String>().get(id, "hostName") == null
+        if (isHost) {
+            redisTemplate.opsForHash<String, String>().put(id, "hostName", name)
+            redisTemplate.expire(id, 1, TimeUnit.HOURS)
+        }
+        redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, false)
+    }
+
+    fun exitRoom(id: String, name: String) {
+        if (!isHost(id, name)) {
+            redisTemplate.delete(id)
+            redisTemplate.delete("$id:players")
+        }
+        redisTemplate.opsForHash<String, Boolean>().delete("$id:players", name)
+    }
+
+    fun ready(id: String, name: String) {
+        redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, true)
+    }
+
+    fun unready(id: String, name: String) {
+        redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, false)
+    }
+
+    fun changeGame(id: String, name: String, gameId: String) {
+        if (!isHost(id, name)) {
+            throw IllegalArgumentException("Only host can change game")
+        }
+        redisTemplate.opsForHash<String, String>().put(id, "gameId", gameId)
+    }
+
+    fun changePlayerName(id: String, name: String, newName: String) {
+        redisTemplate.opsForHash<String, Boolean>().delete("$id:players", name)
+        redisTemplate.opsForHash<String, Boolean>().put("$id:players", newName, false)
+    }
+
+    private fun isHost(id: String, name: String): Boolean {
+        return redisTemplate.opsForHash<String, String>().get(id, "hostName") == name
     }
 }
 
