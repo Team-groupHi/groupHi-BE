@@ -20,7 +20,7 @@ jobs:
       - name: Make application.yml
         run: |
           mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION }}" > src/main/resources/application.yml
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
