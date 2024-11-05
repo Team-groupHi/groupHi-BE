@@ -59,16 +59,16 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { 
         redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, false)
     }
 
-    fun changeName(id: String, name: String, newName: String) {
-        redisTemplate.opsForHash<String, Boolean>().delete("$id:players", name)
-        redisTemplate.opsForHash<String, Boolean>().put("$id:players", newName, false)
-    }
-
     fun changeGame(id: String, name: String, gameId: String) {
         if (!isHost(id, name)) {
             throw IllegalArgumentException("Only host can change game")
         }
         redisTemplate.opsForHash<String, String>().put(id, "gameId", gameId)
+    }
+
+    fun changePlayerName(id: String, name: String, newName: String) {
+        redisTemplate.opsForHash<String, Boolean>().delete("$id:players", name)
+        redisTemplate.opsForHash<String, Boolean>().put("$id:players", newName, false)
     }
 
     private fun isHost(id: String, name: String): Boolean {

@@ -101,25 +101,6 @@ class RoomMessageController( //TODO: refactor
         )
     }
 
-    @MessageMapping("/rooms/change-player-name")
-    fun changePlayerName(
-        @Payload request: RoomPlayerNameChangeRequest,
-        headerAccessor: SimpMessageHeaderAccessor
-    ) {
-        headerAccessor.sessionAttributes?.set("name", request.name)
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        roomMessageService.changeName(roomId!!, name, request.name)
-        messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
-            RoomMessageResponse(
-                type = RoomResponseMessageType.CHANGE_NAME,
-                sender = "System",
-                content = "$name has changed the nickname to ${request.name}."
-            )
-        )
-    }
-
     @MessageMapping("/rooms/change-game")
     fun changeGame(
         @Payload request: RoomGameChangeRequest,
@@ -134,6 +115,25 @@ class RoomMessageController( //TODO: refactor
                 type = RoomResponseMessageType.CHANGE_GAME,
                 sender = "System",
                 content = "$name has changed the game."
+            )
+        )
+    }
+
+    @MessageMapping("/rooms/change-player-name")
+    fun changePlayerName(
+        @Payload request: RoomPlayerNameChangeRequest,
+        headerAccessor: SimpMessageHeaderAccessor
+    ) {
+        headerAccessor.sessionAttributes?.set("name", request.name)
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
+        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
+        roomMessageService.changePlayerName(roomId!!, name, request.name)
+        messagingTemplate.convertAndSend(
+            "/sub/rooms/$roomId",
+            RoomMessageResponse(
+                type = RoomResponseMessageType.CHANGE_PLAYER_NAME,
+                sender = "System",
+                content = "$name has changed the nickname to ${request.name}."
             )
         )
     }
@@ -162,5 +162,5 @@ enum class RoomResponseMessageType {
     READY,
     UNREADY,
     CHANGE_GAME,
-    CHANGE_NAME
+    CHANGE_PLAYER_NAME
 }

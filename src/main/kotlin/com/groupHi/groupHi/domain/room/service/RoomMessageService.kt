@@ -21,11 +21,11 @@ class RoomMessageService(private val roomCacheService: RoomCacheService) {
         roomCacheService.unready(roomId, name)
     }
 
-    fun changeName(roomId: String, name: String, newName: String) {
-        roomCacheService.changeName(roomId, name, newName)
-    }
-
     fun changeGame(roomId: String, name: String, gameId: String) {
         roomCacheService.changeGame(roomId, name, gameId)
+    }
+
+    fun changePlayerName(roomId: String, name: String, newName: String) {
+        roomCacheService.changePlayerName(roomId, name, newName)
     }
 }
