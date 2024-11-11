@@ -10,5 +10,6 @@ data class BalanceGameResultGetResponse(
 
 data class BalanceGameSelectionsResponse(
     val a: List<String>,
-    val b: List<String>
+    val b: List<String>,
+    val c: List<String>
 )
