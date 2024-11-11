@@ -19,7 +19,7 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { 
 
     fun getRoom(id: String): RoomResponse {
         val room = redisTemplate.opsForHash<String, Any>().entries(id)
-        val players = redisTemplate.opsForHash<String, Any>().entries("$id:players")
+        val players = getPlayers(id)
         return RoomResponse(
             id = id,
             status = room["status"] as RoomStatus,
@@ -32,6 +32,16 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { 
                 )
             }
         )
+    }
+
+    fun getPlayers(id: String): List<PlayerResponse> {
+        return redisTemplate.opsForHash<String, Boolean>().entries("$id:players")
+            .map { (name, isReady) ->
+                PlayerResponse(
+                    name = name,
+                    isReady = isReady
+                )
+            }
     }
 
     fun enterRoom(id: String, name: String) {

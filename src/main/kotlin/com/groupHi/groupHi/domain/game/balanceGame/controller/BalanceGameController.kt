@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/games")
 class BalanceGameController(private val balanceGameService: BalanceGameService) {
 
-    @Operation(summary = "밸런스 게임 결과 조회")
+    @Operation(summary = "밸런스 게임 결과 조회", description = "round가 주어지지 않으면 모든 라운드의 결과를 반환합니다.")
     @GetMapping("/balance-game/results")
     fun getBalanceGameResults(
         @RequestParam roomId: String,
