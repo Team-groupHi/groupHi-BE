@@ -4,8 +4,9 @@ import com.groupHi.groupHi.domain.room.dto.request.RoomChatRequest
 import com.groupHi.groupHi.domain.room.dto.request.RoomEnterRequest
 import com.groupHi.groupHi.domain.room.dto.request.RoomGameChangeRequest
 import com.groupHi.groupHi.domain.room.dto.request.RoomPlayerNameChangeRequest
-import com.groupHi.groupHi.domain.room.dto.response.RoomMessageResponse
 import com.groupHi.groupHi.domain.room.service.RoomMessageService
+import com.groupHi.groupHi.global.dto.MessageType
+import com.groupHi.groupHi.global.dto.response.MessageResponse
 import org.springframework.context.event.EventListener
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
@@ -31,8 +32,8 @@ class RoomMessageController( //TODO: refactor
         roomMessageService.enterRoom(request.roomId, request.name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/${request.roomId}",
-            RoomMessageResponse(
-                type = RoomResponseMessageType.ENTER,
+            MessageResponse(
+                type = MessageType.ENTER,
                 sender = "System",
                 content = "${request.name} has entered the room."
             )
@@ -46,8 +47,8 @@ class RoomMessageController( //TODO: refactor
         roomMessageService.exitRoom(roomId!!, name) //TODO: 방장 나가면 방 폭바
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
-            RoomMessageResponse(
-                type = RoomResponseMessageType.EXIT,
+            MessageResponse(
+                type = MessageType.EXIT,
                 sender = "System",
                 content = "$name has left the room."
             )
@@ -63,8 +64,8 @@ class RoomMessageController( //TODO: refactor
         val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
-            RoomMessageResponse(
-                type = RoomResponseMessageType.CHAT,
+            MessageResponse(
+                type = MessageType.CHAT,
                 sender = name,
                 content = request.message
             )
@@ -78,8 +79,8 @@ class RoomMessageController( //TODO: refactor
         roomMessageService.ready(roomId!!, name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
-            RoomMessageResponse(
-                type = RoomResponseMessageType.READY,
+            MessageResponse(
+                type = MessageType.READY,
                 sender = "System",
                 content = "$name is ready."
             )
@@ -93,8 +94,8 @@ class RoomMessageController( //TODO: refactor
         roomMessageService.unready(roomId!!, name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
-            RoomMessageResponse(
-                type = RoomResponseMessageType.UNREADY,
+            MessageResponse(
+                type = MessageType.UNREADY,
                 sender = "System",
                 content = "$name is unready."
             )
@@ -111,8 +112,8 @@ class RoomMessageController( //TODO: refactor
         roomMessageService.changeGame(roomId!!, name, request.gameId) //TODO: 방장 권한
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
-            RoomMessageResponse(
-                type = RoomResponseMessageType.CHANGE_GAME,
+            MessageResponse(
+                type = MessageType.CHANGE_GAME,
                 sender = "System",
                 content = "$name has changed the game."
             )
@@ -130,8 +131,8 @@ class RoomMessageController( //TODO: refactor
         roomMessageService.changePlayerName(roomId!!, name, request.name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
-            RoomMessageResponse(
-                type = RoomResponseMessageType.CHANGE_PLAYER_NAME,
+            MessageResponse(
+                type = MessageType.CHANGE_PLAYER_NAME,
                 sender = "System",
                 content = "$name has changed the nickname to ${request.name}."
             )
@@ -146,21 +147,11 @@ class RoomMessageController( //TODO: refactor
         roomMessageService.exitRoom(roomId!!, name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
-            RoomMessageResponse(
-                type = RoomResponseMessageType.EXIT,
+            MessageResponse(
+                type = MessageType.EXIT,
                 sender = "System",
                 content = "$name has left the room."
             )
         )
     }
-}
-
-enum class RoomResponseMessageType {
-    ENTER,
-    EXIT,
-    CHAT,
-    READY,
-    UNREADY,
-    CHANGE_GAME,
-    CHANGE_PLAYER_NAME
 }
