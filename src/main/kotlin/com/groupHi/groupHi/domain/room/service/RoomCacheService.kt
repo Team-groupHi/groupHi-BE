@@ -38,9 +38,10 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { 
         redisTemplate.opsForHash<String, RoomStatus>().put(id, "status", status)
     }
 
-    // 모든 플레이어 준비상태 false로
+    // 방장을 제외한 모든 플레이어 준비상태 false로
     fun resetPlayerReady(id: String) {
         redisTemplate.opsForHash<String, Boolean>().entries("$id:players")
+            .filter { (name, _) -> !isHost(id, name) }
             .forEach { (name, _) ->
                 redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, false)
             }
@@ -63,7 +64,7 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { 
             redisTemplate.opsForHash<String, String>().put(id, "hostName", name)
             redisTemplate.expire(id, 1, TimeUnit.HOURS)
         }
-        redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, false)
+        redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, isHost)
     }
 
     fun exitRoom(id: String, name: String) {
