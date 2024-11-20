@@ -38,6 +38,15 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { 
         redisTemplate.opsForHash<String, RoomStatus>().put(id, "status", status)
     }
 
+    // 모든 플레이어 준비상태 false로
+    fun resetPlayerReady(id: String) {
+        redisTemplate.opsForHash<String, Boolean>().entries("$id:players")
+            .forEach { (name, _) ->
+                redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, false)
+            }
+    }
+
+
     fun getPlayers(id: String): List<PlayerResponse> {
         return redisTemplate.opsForHash<String, Boolean>().entries("$id:players")
             .map { (name, isReady) ->

@@ -65,6 +65,12 @@ class BalanceGameCacheService(
         redisTemplate.opsForSet().remove("bg:$roomId:$round:result:${BalanceGameSelection.B}", name)
     }
 
+    fun clean(roomId: String) {
+        redisTemplate.delete("bg:$roomId:rounds")
+        redisTemplate.delete("bg:$roomId:contents")
+        //TODO: selection 자료구조 리팩터링 후 삭제 로직 추가
+    }
+
     fun getSelections(roomId: String, round: Int): SelectionsResponse { //TODO: 자료구조 리팩터링
         val a = redisTemplate.opsForSet().members("bg:$roomId:$round:result:a")?.map { it.toString() } ?: emptyList()
         val b = redisTemplate.opsForSet().members("bg:$roomId:$round:result:b")?.map { it.toString() } ?: emptyList()

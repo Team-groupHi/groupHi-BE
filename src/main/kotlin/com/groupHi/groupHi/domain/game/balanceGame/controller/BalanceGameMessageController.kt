@@ -108,13 +108,12 @@ class BalanceGameMessageController( //TODO: refactor, timer
     fun end(headerAccessor: SimpMessageHeaderAccessor) {
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
         val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        balanceGameService.end(roomId!!, name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_END,
                 sender = "System",
-                content = "Go back to the waiting room."
+                content = balanceGameService.end(roomId!!, name)
             )
         )
     }

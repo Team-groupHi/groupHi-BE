@@ -70,8 +70,15 @@ class BalanceGameService(
         )
     }
 
-    fun end(roomId: String, name: String) {
-        // 결과 전송 및 데이터 정리
+    fun end(roomId: String, name: String): List<BalanceGameResultGetResponse> {
+        val room = roomCacheService.getRoom(roomId)
+        if (room.hostName != name) {
+            throw IllegalArgumentException("Only the host can start the game.")
+        }
+        roomCacheService.resetPlayerReady(roomId)
+        roomCacheService.updateRoomStatus(roomId, RoomStatus.WAITING)
+        balanceGameCacheService.clean(roomId)
+        return getBalanceGameResults(roomId, null)
     }
 
     fun getBalanceGameResults(roomId: String, round: Int?): List<BalanceGameResultGetResponse> {
