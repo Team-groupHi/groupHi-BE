@@ -34,6 +34,10 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { 
         )
     }
 
+    fun updateRoomStatus(id: String, status: RoomStatus) {
+        redisTemplate.opsForHash<String, RoomStatus>().put(id, "status", status)
+    }
+
     fun getPlayers(id: String): List<PlayerResponse> {
         return redisTemplate.opsForHash<String, Boolean>().entries("$id:players")
             .map { (name, isReady) ->
@@ -81,7 +85,7 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { 
         redisTemplate.opsForHash<String, Boolean>().put("$id:players", newName, false)
     }
 
-    private fun isHost(id: String, name: String): Boolean {
+    fun isHost(id: String, name: String): Boolean {
         return redisTemplate.opsForHash<String, String>().get(id, "hostName") == name
     }
 }
