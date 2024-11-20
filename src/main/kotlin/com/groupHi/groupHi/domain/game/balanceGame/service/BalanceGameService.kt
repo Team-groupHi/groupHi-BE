@@ -55,6 +55,25 @@ class BalanceGameService(
         balanceGameCacheService.unselect(roomId, name, round)
     }
 
+    fun next(roomId: String, name: String): RoundResponse {
+        balanceGameCacheService.increaseRound(roomId)
+        val rounds = balanceGameCacheService.getRounds(roomId)
+        val content = balanceGameCacheService.getContents(roomId)[rounds.currentRound - 1]
+        return RoundResponse(
+            totalRounds = rounds.totalRounds,
+            currentRound = rounds.currentRound,
+            startTime = LocalDateTime.now(),
+            endTime = LocalDateTime.now().plusSeconds(30),
+            q = content.q,
+            a = content.a,
+            b = content.b
+        )
+    }
+
+    fun end(roomId: String, name: String) {
+        // 결과 전송 및 데이터 정리
+    }
+
     fun getBalanceGameResults(roomId: String, round: Int?): List<BalanceGameResultGetResponse> {
         val contents = balanceGameCacheService.getContents(roomId)
         val players = roomCacheService.getPlayers(roomId)
@@ -77,15 +96,5 @@ class BalanceGameService(
                     )
                 )
             }
-    }
-
-    fun next(roomId: String, name: String) {
-        // round 세팅
-        // selection 세팅
-        // timer 및 qna 전송
-    }
-
-    fun end(roomId: String, name: String) {
-        // 결과 전송 및 데이터 정리
     }
 }
