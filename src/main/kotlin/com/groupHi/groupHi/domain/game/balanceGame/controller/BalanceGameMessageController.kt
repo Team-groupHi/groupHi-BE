@@ -1,5 +1,6 @@
 package com.groupHi.groupHi.domain.game.balanceGame.controller
 
+import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameSelection
 import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameTheme
 import com.groupHi.groupHi.domain.game.balanceGame.service.BalanceGameService
 import com.groupHi.groupHi.global.dto.MessageType
@@ -41,7 +42,7 @@ class BalanceGameMessageController( //TODO: refactor, timer
     ) {
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
         val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        balanceGameService.select(roomId!!, name, currentRound, "a")
+        balanceGameService.select(roomId!!, name, currentRound, BalanceGameSelection.A)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
@@ -59,7 +60,7 @@ class BalanceGameMessageController( //TODO: refactor, timer
     ) {
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
         val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        balanceGameService.select(roomId!!, name, currentRound, "b")
+        balanceGameService.select(roomId!!, name, currentRound, BalanceGameSelection.B)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
@@ -71,10 +72,13 @@ class BalanceGameMessageController( //TODO: refactor, timer
     }
 
     @MessageMapping("/games/balance-game/unselect")
-    fun unselect(headerAccessor: SimpMessageHeaderAccessor) {
+    fun unselect(
+        headerAccessor: SimpMessageHeaderAccessor,
+        @Payload currentRound: Int
+    ) {
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
         val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        balanceGameService.unselect(roomId!!, name)
+        balanceGameService.unselect(roomId!!, name, currentRound)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(

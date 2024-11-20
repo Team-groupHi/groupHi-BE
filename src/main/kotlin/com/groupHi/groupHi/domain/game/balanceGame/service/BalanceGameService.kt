@@ -1,5 +1,6 @@
 package com.groupHi.groupHi.domain.game.balanceGame.service
 
+import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameSelection
 import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameTheme
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameResultGetResponse
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameSelectionsResponse
@@ -46,10 +47,12 @@ class BalanceGameService(
         )
     }
 
-    fun select(roomId: String, name: String, round: Int, selection: String) {
+    fun select(roomId: String, name: String, round: Int, selection: BalanceGameSelection) {
+        balanceGameCacheService.select(roomId, name, round, selection)
     }
 
-    fun unselect(roomId: String, name: String) {
+    fun unselect(roomId: String, name: String, round: Int) {
+        balanceGameCacheService.unselect(roomId, name, round)
     }
 
     fun getBalanceGameResults(roomId: String, round: Int?): List<BalanceGameResultGetResponse> {

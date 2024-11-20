@@ -1,5 +1,6 @@
 package com.groupHi.groupHi.domain.game.balanceGame.service
 
+import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameSelection
 import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameTheme
 import com.groupHi.groupHi.domain.game.balanceGame.repository.BalanceGameContentRepository
 import org.springframework.data.redis.core.RedisTemplate
@@ -55,8 +56,13 @@ class BalanceGameCacheService(
         }
     }
 
-    fun select(roomId: String, name: String, round: Int, selection: String) {
+    fun select(roomId: String, name: String, round: Int, selection: BalanceGameSelection) {
         redisTemplate.opsForSet().add("bg:$roomId:$round:result:$selection", name)
+    }
+
+    fun unselect(roomId: String, name: String, round: Int) {
+        redisTemplate.opsForSet().remove("bg:$roomId:$round:result:${BalanceGameSelection.A}", name)
+        redisTemplate.opsForSet().remove("bg:$roomId:$round:result:${BalanceGameSelection.B}", name)
     }
 
     fun getSelections(roomId: String, round: Int): SelectionsResponse { //TODO: 자료구조 리팩터링
