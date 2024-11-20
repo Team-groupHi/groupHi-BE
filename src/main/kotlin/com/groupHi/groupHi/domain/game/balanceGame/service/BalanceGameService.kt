@@ -56,6 +56,11 @@ class BalanceGameService(
     }
 
     fun next(roomId: String, name: String): RoundResponse {
+        val room = roomCacheService.getRoom(roomId)
+        if (room.hostName != name) {
+            throw IllegalArgumentException("Only the host can start the game.")
+        }
+
         balanceGameCacheService.increaseRound(roomId)
         val rounds = balanceGameCacheService.getRounds(roomId)
         val content = balanceGameCacheService.getContents(roomId)[rounds.currentRound - 1]
