@@ -2,7 +2,7 @@ package com.groupHi.groupHi.domain.game.balanceGame.dto.response
 
 import java.time.LocalDateTime
 
-data class RoundResponse(
+data class BalanceGameRoundResponse(
     val totalRounds: Int,
     val currentRound: Int,
     val startTime: LocalDateTime,

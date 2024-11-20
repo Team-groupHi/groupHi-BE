@@ -4,7 +4,7 @@ import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameSelection
 import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameTheme
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameResultGetResponse
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameSelectionsResponse
-import com.groupHi.groupHi.domain.game.balanceGame.dto.response.RoundResponse
+import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameRoundResponse
 import com.groupHi.groupHi.domain.room.service.RoomCacheService
 import com.groupHi.groupHi.domain.room.service.RoomStatus
 import org.springframework.stereotype.Service
@@ -16,7 +16,7 @@ class BalanceGameService(
     private val balanceGameCacheService: BalanceGameCacheService
 ) {
 
-    fun start(roomId: String, name: String, theme: BalanceGameTheme, totalRounds: Int): RoundResponse {
+    fun start(roomId: String, name: String, theme: BalanceGameTheme, totalRounds: Int): BalanceGameRoundResponse {
         val room = roomCacheService.getRoom(roomId)
         if (room.hostName != name) {
             throw IllegalArgumentException("Only the host can start the game.")
@@ -36,7 +36,7 @@ class BalanceGameService(
         balanceGameCacheService.increaseRound(roomId)
 
         val content = balanceGameCacheService.getContents(roomId).first()
-        return RoundResponse(
+        return BalanceGameRoundResponse(
             totalRounds = totalRounds,
             currentRound = 1,
             startTime = LocalDateTime.now(),
@@ -55,7 +55,7 @@ class BalanceGameService(
         balanceGameCacheService.unselect(roomId, name, round)
     }
 
-    fun next(roomId: String, name: String): RoundResponse {
+    fun next(roomId: String, name: String): BalanceGameRoundResponse {
         val room = roomCacheService.getRoom(roomId)
         if (room.hostName != name) {
             throw IllegalArgumentException("Only the host can start the game.")
@@ -64,7 +64,7 @@ class BalanceGameService(
         balanceGameCacheService.increaseRound(roomId)
         val rounds = balanceGameCacheService.getRounds(roomId)
         val content = balanceGameCacheService.getContents(roomId)[rounds.currentRound - 1]
-        return RoundResponse(
+        return BalanceGameRoundResponse(
             totalRounds = rounds.totalRounds,
             currentRound = rounds.currentRound,
             startTime = LocalDateTime.now(),
