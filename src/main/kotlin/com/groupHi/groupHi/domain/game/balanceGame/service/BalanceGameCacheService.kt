@@ -44,9 +44,9 @@ class BalanceGameCacheService(
             entry.key.split(":")[1]
         }
         return groupedContents.toSortedMap().map { (round, entries) ->
-            val q = entries.find { it.key.endsWith(":q") }?.value ?: ""
-            val a = entries.find { it.key.endsWith(":a") }?.value ?: ""
-            val b = entries.find { it.key.endsWith(":b") }?.value ?: ""
+            val q = entries.find { it.key.startsWith("q:") }?.value ?: ""
+            val a = entries.find { it.key.startsWith("a:") }?.value ?: ""
+            val b = entries.find { it.key.startsWith("b:") }?.value ?: ""
             ContentResponse(
                 round = round.toInt(),
                 q = q,
