@@ -1,7 +1,8 @@
 package com.groupHi.groupHi.domain.game.balanceGame.controller
 
 import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameSelection
-import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameTheme
+import com.groupHi.groupHi.domain.game.balanceGame.dto.request.BalanceGameSelectRequest
+import com.groupHi.groupHi.domain.game.balanceGame.dto.request.BalanceGameStartRequest
 import com.groupHi.groupHi.domain.game.balanceGame.service.BalanceGameService
 import com.groupHi.groupHi.global.dto.MessageType
 import com.groupHi.groupHi.global.dto.response.MessageResponse
@@ -20,8 +21,7 @@ class BalanceGameMessageController( //TODO: refactor, timer
     @MessageMapping("/games/balance-game/start")
     fun start(
         headerAccessor: SimpMessageHeaderAccessor,
-        @Payload theme: BalanceGameTheme,
-        @Payload totalRounds: Int
+        @Payload request: BalanceGameStartRequest
     ) {
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
         val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
@@ -30,7 +30,7 @@ class BalanceGameMessageController( //TODO: refactor, timer
             MessageResponse(
                 type = MessageType.BG_START,
                 sender = "System",
-                content = balanceGameService.start(roomId!!, name, theme, totalRounds)
+                content = balanceGameService.start(roomId!!, name, request.theme, request.totalRounds)
             )
         )
     }
@@ -38,11 +38,11 @@ class BalanceGameMessageController( //TODO: refactor, timer
     @MessageMapping("/games/balance-game/select-a")
     fun selectA(
         headerAccessor: SimpMessageHeaderAccessor,
-        @Payload currentRound: Int
+        @Payload request: BalanceGameSelectRequest
     ) {
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
         val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        balanceGameService.select(roomId!!, name, currentRound, BalanceGameSelection.A)
+        balanceGameService.select(roomId!!, name, request.currentRound, BalanceGameSelection.A)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
@@ -56,11 +56,11 @@ class BalanceGameMessageController( //TODO: refactor, timer
     @MessageMapping("/games/balance-game/select-b")
     fun selectB(
         headerAccessor: SimpMessageHeaderAccessor,
-        @Payload currentRound: Int
+        @Payload request: BalanceGameSelectRequest
     ) {
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
         val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        balanceGameService.select(roomId!!, name, currentRound, BalanceGameSelection.B)
+        balanceGameService.select(roomId!!, name, request.currentRound, BalanceGameSelection.B)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
@@ -74,11 +74,11 @@ class BalanceGameMessageController( //TODO: refactor, timer
     @MessageMapping("/games/balance-game/unselect")
     fun unselect(
         headerAccessor: SimpMessageHeaderAccessor,
-        @Payload currentRound: Int
+        @Payload request: BalanceGameSelectRequest
     ) {
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
         val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        balanceGameService.unselect(roomId!!, name, currentRound)
+        balanceGameService.unselect(roomId!!, name, request.currentRound)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
@@ -93,13 +93,12 @@ class BalanceGameMessageController( //TODO: refactor, timer
     fun next(headerAccessor: SimpMessageHeaderAccessor) {
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
         val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        balanceGameService.next(roomId!!, name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_NEXT,
                 sender = "System",
-                content = "Move to the next round."
+                content = balanceGameService.next(roomId!!, name)
             )
         )
     }
