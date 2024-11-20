@@ -15,7 +15,6 @@ class RoomService(
     fun createRoom(request: RoomCreateRequest): String {
         val game = gameRepository.findById(request.gameId)
             .orElseThrow { IllegalArgumentException("Game not found") }
-
         val roomId = generateRoomId()
         roomCacheService.createRoom(roomId, game.id)
         return roomId
@@ -45,7 +44,7 @@ class RoomService(
             val roomId = (1..8)
                 .map { charset.random() }
                 .joinToString("")
-            if (roomCacheService.isRoomExist(roomId)) {
+            if (!roomCacheService.isRoomExist(roomId)) {
                 return roomId
             }
         }
