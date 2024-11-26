@@ -134,7 +134,7 @@ class RoomMessageController( //TODO: refactor
             MessageResponse(
                 type = MessageType.CHANGE_PLAYER_NAME,
                 sender = "System",
-                content = "$name has changed the nickname to ${request.name}."
+                content = request.name
             )
         )
     }
