@@ -26,6 +26,9 @@ class RoomMessageService(private val roomCacheService: RoomCacheService) {
     }
 
     fun changePlayerName(roomId: String, name: String, newName: String) {
+        if(roomCacheService.isRoomPlaying(roomId)) {
+            throw IllegalStateException("Cannot change player name while playing")
+        }
         roomCacheService.changePlayerName(roomId, name, newName)
     }
 }

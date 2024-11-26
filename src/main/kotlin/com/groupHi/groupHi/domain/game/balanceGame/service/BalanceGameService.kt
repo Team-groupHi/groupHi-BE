@@ -3,8 +3,8 @@ package com.groupHi.groupHi.domain.game.balanceGame.service
 import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameSelection
 import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameTheme
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameResultGetResponse
-import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameSelectionsResponse
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameRoundResponse
+import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameSelectionsResponse
 import com.groupHi.groupHi.domain.room.service.RoomCacheService
 import com.groupHi.groupHi.domain.room.service.RoomStatus
 import org.springframework.stereotype.Service
@@ -58,7 +58,7 @@ class BalanceGameService(
     fun next(roomId: String, name: String): BalanceGameRoundResponse {
         val room = roomCacheService.getRoom(roomId)
         if (room.hostName != name) {
-            throw IllegalArgumentException("Only the host can start the game.")
+            throw IllegalArgumentException("Only the host can next the game.")
         }
 
         balanceGameCacheService.increaseRound(roomId)
@@ -75,15 +75,14 @@ class BalanceGameService(
         )
     }
 
-    fun end(roomId: String, name: String): List<BalanceGameResultGetResponse> {
+    fun end(roomId: String, name: String) {
         val room = roomCacheService.getRoom(roomId)
         if (room.hostName != name) {
-            throw IllegalArgumentException("Only the host can start the game.")
+            throw IllegalArgumentException("Only the host can end the game.")
         }
         roomCacheService.resetPlayerReady(roomId)
         roomCacheService.updateRoomStatus(roomId, RoomStatus.WAITING)
         balanceGameCacheService.clean(roomId)
-        return getBalanceGameResults(roomId, null)
     }
 
     fun getBalanceGameResults(roomId: String, round: Int?): List<BalanceGameResultGetResponse> {
