@@ -68,7 +68,7 @@ class BalanceGameCacheService(
     fun clean(roomId: String) {
         redisTemplate.delete("bg:$roomId:rounds")
         redisTemplate.delete("bg:$roomId:contents")
-        //TODO: selection 자료구조 리팩터링 후 삭제 로직 추가
+        redisTemplate.delete("bg:$roomId:selections")
     }
 
     fun getSelections(roomId: String, round: Int): SelectionsResponse { //TODO: 자료구조 리팩터링
