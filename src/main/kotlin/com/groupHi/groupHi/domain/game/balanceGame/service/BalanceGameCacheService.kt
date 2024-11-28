@@ -64,12 +64,13 @@ class BalanceGameCacheService(
     }
 
     fun select(roomId: String, name: String, round: Int, selection: BalanceGameSelection) {
-        redisTemplate.opsForSet().add("bg:$roomId:$round:result:$selection", name)
+        redisTemplate.opsForHash<String, BalanceGameSelection>()
+            .put("bg:$roomId:selections", "$name:$round", selection)
     }
 
     fun unselect(roomId: String, name: String, round: Int) {
-        redisTemplate.opsForSet().remove("bg:$roomId:$round:result:${BalanceGameSelection.A}", name)
-        redisTemplate.opsForSet().remove("bg:$roomId:$round:result:${BalanceGameSelection.B}", name)
+        redisTemplate.opsForHash<String, BalanceGameSelection>()
+            .put("bg:$roomId:selections", "$name:$round", BalanceGameSelection.C)
     }
 
     fun clean(roomId: String) {
