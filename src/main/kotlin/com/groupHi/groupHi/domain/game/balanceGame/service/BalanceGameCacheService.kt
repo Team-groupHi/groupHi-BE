@@ -27,6 +27,9 @@ class BalanceGameCacheService(
                     .put("bg:$roomId:selections", "$name:$round", BalanceGameSelection.C)
             }
         }
+        redisTemplate.expire("bg:$roomId:rounds", 1, java.util.concurrent.TimeUnit.HOURS)
+        redisTemplate.expire("bg:$roomId:contents", 1, java.util.concurrent.TimeUnit.HOURS)
+        redisTemplate.expire("bg:$roomId:selections", 1, java.util.concurrent.TimeUnit.HOURS)
     }
 
     fun getRounds(roomId: String): RoundsResponse {
