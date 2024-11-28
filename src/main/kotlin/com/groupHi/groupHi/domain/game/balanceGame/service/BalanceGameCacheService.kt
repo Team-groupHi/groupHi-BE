@@ -5,6 +5,7 @@ import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameTheme
 import com.groupHi.groupHi.domain.game.balanceGame.repository.BalanceGameContentRepository
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
+import java.util.concurrent.TimeUnit
 
 @Service
 class BalanceGameCacheService(
@@ -27,9 +28,9 @@ class BalanceGameCacheService(
                     .put("bg:$roomId:selections", "$name:$round", BalanceGameSelection.C)
             }
         }
-        redisTemplate.expire("bg:$roomId:rounds", 1, java.util.concurrent.TimeUnit.HOURS)
-        redisTemplate.expire("bg:$roomId:contents", 1, java.util.concurrent.TimeUnit.HOURS)
-        redisTemplate.expire("bg:$roomId:selections", 1, java.util.concurrent.TimeUnit.HOURS)
+        redisTemplate.expire("bg:$roomId:rounds", 1, TimeUnit.HOURS)
+        redisTemplate.expire("bg:$roomId:contents", 1, TimeUnit.HOURS)
+        redisTemplate.expire("bg:$roomId:selections", 1, TimeUnit.HOURS)
     }
 
     fun getRounds(roomId: String): RoundsResponse {
