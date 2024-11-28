@@ -87,23 +87,20 @@ class BalanceGameService(
 
     fun getBalanceGameResults(roomId: String, round: Int?): List<BalanceGameResultGetResponse> {
         val contents = balanceGameCacheService.getContents(roomId)
-        val players = roomCacheService.getPlayers(roomId)
+        val selections = balanceGameCacheService.getSelections(roomId)
 
         return contents
             .filter { round == null || it.round == round }
             .map { content ->
-                val selection = balanceGameCacheService.getSelections(roomId, content.round)
                 BalanceGameResultGetResponse(
                     round = content.round,
                     q = content.q,
                     a = content.a,
                     b = content.b,
                     result = BalanceGameSelectionsResponse(
-                        a = selection.a,
-                        b = selection.b,
-                        c = players
-                            .filter { player -> player.name !in selection.a && player.name !in selection.b }
-                            .map { player -> player.name }
+                        a = selections[content.round - 1].a,
+                        b = selections[content.round - 1].b,
+                        c = selections[content.round - 1].c
                     )
                 )
             }

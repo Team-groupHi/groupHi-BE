@@ -5,21 +5,32 @@ import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameTheme
 import com.groupHi.groupHi.domain.game.balanceGame.repository.BalanceGameContentRepository
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
+import java.util.concurrent.TimeUnit
 
 @Service
 class BalanceGameCacheService(
     private val redisTemplate: RedisTemplate<String, Any>,
     private val balanceGameContentRepository: BalanceGameContentRepository
-) { //TODO: 키값 상수화
+) { //TODO: 키값 상수화, 서비스 로직과 책임 명확히 나누어 가지도록 리팩터링하기
 
     fun init(roomId: String, theme: BalanceGameTheme, totalRounds: Int) {
         redisTemplate.opsForValue().set("bg:$roomId:rounds", "0/$totalRounds")
         val contents = balanceGameContentRepository.findByTheme(theme).shuffled().take(totalRounds)
+        val players = redisTemplate.opsForHash<String, Boolean>().entries("$roomId:players").keys
         contents.forEachIndexed { idx, content ->
             redisTemplate.opsForHash<String, String>().put("bg:$roomId:contents", "q:${idx + 1}", content.q)
             redisTemplate.opsForHash<String, String>().put("bg:$roomId:contents", "a:${idx + 1}", content.a)
             redisTemplate.opsForHash<String, String>().put("bg:$roomId:contents", "b:${idx + 1}", content.b)
         }
+        players.forEach { name ->
+            (1..totalRounds).forEach { round ->
+                redisTemplate.opsForHash<String, BalanceGameSelection>()
+                    .put("bg:$roomId:selections", "$name:$round", BalanceGameSelection.C)
+            }
+        }
+        redisTemplate.expire("bg:$roomId:rounds", 1, TimeUnit.HOURS)
+        redisTemplate.expire("bg:$roomId:contents", 1, TimeUnit.HOURS)
+        redisTemplate.expire("bg:$roomId:selections", 1, TimeUnit.HOURS)
     }
 
     fun getRounds(roomId: String): RoundsResponse {
@@ -57,28 +68,36 @@ class BalanceGameCacheService(
     }
 
     fun select(roomId: String, name: String, round: Int, selection: BalanceGameSelection) {
-        redisTemplate.opsForSet().add("bg:$roomId:$round:result:$selection", name)
+        redisTemplate.opsForHash<String, BalanceGameSelection>()
+            .put("bg:$roomId:selections", "$name:$round", selection)
     }
 
     fun unselect(roomId: String, name: String, round: Int) {
-        redisTemplate.opsForSet().remove("bg:$roomId:$round:result:${BalanceGameSelection.A}", name)
-        redisTemplate.opsForSet().remove("bg:$roomId:$round:result:${BalanceGameSelection.B}", name)
+        redisTemplate.opsForHash<String, BalanceGameSelection>()
+            .put("bg:$roomId:selections", "$name:$round", BalanceGameSelection.C)
     }
 
     fun clean(roomId: String) {
         redisTemplate.delete("bg:$roomId:rounds")
         redisTemplate.delete("bg:$roomId:contents")
-        //TODO: selection 자료구조 리팩터링 후 삭제 로직 추가
+        redisTemplate.delete("bg:$roomId:selections")
     }
 
-    fun getSelections(roomId: String, round: Int): SelectionsResponse { //TODO: 자료구조 리팩터링
-        val a = redisTemplate.opsForSet().members("bg:$roomId:$round:result:a")?.map { it.toString() } ?: emptyList()
-        val b = redisTemplate.opsForSet().members("bg:$roomId:$round:result:b")?.map { it.toString() } ?: emptyList()
-
-        return SelectionsResponse(
-            a = a,
-            b = b
-        )
+    fun getSelections(roomId: String): List<SelectionsResponse> {
+        val selections = redisTemplate.opsForHash<String, BalanceGameSelection>().entries("bg:$roomId:selections")
+        val groupedSelections = selections.entries.groupBy { entry ->
+            entry.key.split(":")[1]
+        }
+        return groupedSelections.toSortedMap().map { (round, entries) ->
+            val a = entries.filter { it.value == BalanceGameSelection.A }.map { it.key.split(":")[0] }
+            val b = entries.filter { it.value == BalanceGameSelection.B }.map { it.key.split(":")[0] }
+            val c = entries.filter { it.value == BalanceGameSelection.C }.map { it.key.split(":")[0] }
+            SelectionsResponse(
+                a = a,
+                b = b,
+                c = c
+            )
+        }
     }
 }
 
@@ -96,5 +115,6 @@ data class ContentResponse(
 
 data class SelectionsResponse(
     val a: List<String>,
-    val b: List<String>
+    val b: List<String>,
+    val c: List<String>
 )
