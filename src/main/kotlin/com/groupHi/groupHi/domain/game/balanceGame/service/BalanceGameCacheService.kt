@@ -10,15 +10,22 @@ import org.springframework.stereotype.Service
 class BalanceGameCacheService(
     private val redisTemplate: RedisTemplate<String, Any>,
     private val balanceGameContentRepository: BalanceGameContentRepository
-) { //TODO: 키값 상수화
+) { //TODO: 키값 상수화, 서비스 로직과 책임 명확히 나누어 가지도록 리팩터링하기
 
     fun init(roomId: String, theme: BalanceGameTheme, totalRounds: Int) {
         redisTemplate.opsForValue().set("bg:$roomId:rounds", "0/$totalRounds")
         val contents = balanceGameContentRepository.findByTheme(theme).shuffled().take(totalRounds)
+        val players = redisTemplate.opsForHash<String, Boolean>().entries("$roomId:players").keys
         contents.forEachIndexed { idx, content ->
             redisTemplate.opsForHash<String, String>().put("bg:$roomId:contents", "q:${idx + 1}", content.q)
             redisTemplate.opsForHash<String, String>().put("bg:$roomId:contents", "a:${idx + 1}", content.a)
             redisTemplate.opsForHash<String, String>().put("bg:$roomId:contents", "b:${idx + 1}", content.b)
+        }
+        players.forEach { name ->
+            (1..totalRounds).forEach { round ->
+                redisTemplate.opsForHash<String, BalanceGameSelection>()
+                    .put("bg:$roomId:selections", "$name:$round", BalanceGameSelection.C)
+            }
         }
     }
 
