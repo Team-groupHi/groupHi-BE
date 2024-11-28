@@ -79,14 +79,21 @@ class BalanceGameCacheService(
         redisTemplate.delete("bg:$roomId:selections")
     }
 
-    fun getSelections(roomId: String, round: Int): SelectionsResponse { //TODO: 자료구조 리팩터링
-        val a = redisTemplate.opsForSet().members("bg:$roomId:$round:result:a")?.map { it.toString() } ?: emptyList()
-        val b = redisTemplate.opsForSet().members("bg:$roomId:$round:result:b")?.map { it.toString() } ?: emptyList()
-
-        return SelectionsResponse(
-            a = a,
-            b = b
-        )
+    fun getSelections(roomId: String): List<SelectionsResponse> {
+        val selections = redisTemplate.opsForHash<String, BalanceGameSelection>().entries("bg:$roomId:selections")
+        val groupedSelections = selections.entries.groupBy { entry ->
+            entry.key.split(":")[1]
+        }
+        return groupedSelections.toSortedMap().map { (round, entries) ->
+            val a = entries.filter { it.value == BalanceGameSelection.A }.map { it.key.split(":")[0] }
+            val b = entries.filter { it.value == BalanceGameSelection.B }.map { it.key.split(":")[0] }
+            val c = entries.filter { it.value == BalanceGameSelection.C }.map { it.key.split(":")[0] }
+            SelectionsResponse(
+                a = a,
+                b = b,
+                c = c
+            )
+        }
     }
 }
 
@@ -104,5 +111,6 @@ data class ContentResponse(
 
 data class SelectionsResponse(
     val a: List<String>,
-    val b: List<String>
+    val b: List<String>,
+    val c: List<String>
 )
