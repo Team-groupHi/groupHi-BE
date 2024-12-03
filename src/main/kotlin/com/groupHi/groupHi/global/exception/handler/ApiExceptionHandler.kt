@@ -19,7 +19,7 @@ class ApiExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(Exception::class)
     protected fun handleException(e: Exception): ResponseEntity<ApiErrorResponse> {
-        print("🚨 $e")
+        println("🚨 $e")
         val e = ApiError.INTERNAL_SERVER_ERROR
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(ApiErrorResponse.from(e))
