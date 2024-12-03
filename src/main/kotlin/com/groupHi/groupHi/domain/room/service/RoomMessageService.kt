@@ -1,5 +1,7 @@
 package com.groupHi.groupHi.domain.room.service
 
+import com.groupHi.groupHi.global.exception.error.MessageError
+import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.stereotype.Service
 
 @Service
@@ -26,8 +28,8 @@ class RoomMessageService(private val roomCacheService: RoomCacheService) {
     }
 
     fun changePlayerName(roomId: String, name: String, newName: String) {
-        if(roomCacheService.isRoomPlaying(roomId)) {
-            throw IllegalStateException("Cannot change player name while playing")
+        if (roomCacheService.isRoomPlaying(roomId)) {
+            throw MessageException(MessageError.NAME_CHANGE_NOT_ALLOWED)
         }
         roomCacheService.changePlayerName(roomId, name, newName)
     }

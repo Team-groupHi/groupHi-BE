@@ -1,6 +1,8 @@
 package com.groupHi.groupHi.global.dto
 
 enum class MessageType {
+    ERROR,
+
     // Room
     ENTER,
     EXIT,
@@ -9,6 +11,7 @@ enum class MessageType {
     UNREADY,
     CHANGE_GAME,
     CHANGE_PLAYER_NAME,
+
     // BalanceGame
     BG_START,
     BG_SELECT,

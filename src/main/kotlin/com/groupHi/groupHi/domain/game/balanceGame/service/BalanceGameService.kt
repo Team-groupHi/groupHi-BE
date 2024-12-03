@@ -7,6 +7,8 @@ import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameRound
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameSelectionsResponse
 import com.groupHi.groupHi.domain.room.service.RoomCacheService
 import com.groupHi.groupHi.domain.room.service.RoomStatus
+import com.groupHi.groupHi.global.exception.error.MessageError
+import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -19,16 +21,13 @@ class BalanceGameService(
     fun start(roomId: String, name: String, theme: BalanceGameTheme, totalRounds: Int): BalanceGameRoundResponse {
         val room = roomCacheService.getRoom(roomId)
         if (room.hostName != name) {
-            throw IllegalArgumentException("Only the host can start the game.")
+            throw MessageException(MessageError.ONLY_HOST_CAN_START)
         }
         if (room.players.any { !it.isReady }) {
-            throw IllegalArgumentException("All players must be ready.")
+            throw MessageException(MessageError.NOT_ALL_PLAYERS_READY)
         }
-        if (totalRounds < 1) {
-            throw IllegalArgumentException("The number of rounds must be greater than 0.")
-        }
-        if (totalRounds > 20) {
-            throw IllegalArgumentException("The number of rounds must be less than 20.")
+        if (totalRounds < 1 || totalRounds > 20) {
+            throw MessageException(MessageError.INVALID_ROUND_COUNT)
         }
         roomCacheService.updateRoomStatus(roomId, RoomStatus.PLAYING)
 
@@ -58,7 +57,7 @@ class BalanceGameService(
     fun next(roomId: String, name: String): BalanceGameRoundResponse {
         val room = roomCacheService.getRoom(roomId)
         if (room.hostName != name) {
-            throw IllegalArgumentException("Only the host can next the game.")
+            throw MessageException(MessageError.ONLY_HOST_CAN_NEXT)
         }
 
         balanceGameCacheService.increaseRound(roomId)
@@ -78,7 +77,7 @@ class BalanceGameService(
     fun end(roomId: String, name: String) {
         val room = roomCacheService.getRoom(roomId)
         if (room.hostName != name) {
-            throw IllegalArgumentException("Only the host can end the game.")
+            throw MessageException(MessageError.ONLY_HOST_CAN_END)
         }
         roomCacheService.resetPlayerReady(roomId)
         roomCacheService.updateRoomStatus(roomId, RoomStatus.WAITING)
