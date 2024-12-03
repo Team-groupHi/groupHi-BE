@@ -1,11 +1,14 @@
 package com.groupHi.groupHi.domain.room.service
 
+import com.groupHi.groupHi.global.exception.error.MessageError
+import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
 @Service
-class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { //TODO: 키값 상수화
+class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) {
+    //TODO: 키값 상수화, 서비스 로직과 책임 명확히 나누어 가지도록 리팩터링하기
 
     fun isRoomExist(id: String): Boolean {
         return redisTemplate.hasKey(id)
@@ -89,7 +92,7 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) { 
 
     fun changeGame(id: String, name: String, gameId: String) {
         if (!isHost(id, name)) {
-            throw IllegalArgumentException("Only host can change game")
+            throw MessageException(MessageError.ONLY_HOST_CAN_CHANGE_GAME)
         }
         redisTemplate.opsForHash<String, String>().put(id, "gameId", gameId)
     }
