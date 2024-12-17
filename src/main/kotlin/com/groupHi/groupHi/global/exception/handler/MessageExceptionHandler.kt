@@ -28,7 +28,8 @@ class MessageExceptionHandler(private val messagingTemplate: SimpMessageSendingO
 
     @MessageExceptionHandler
     fun handleException(e: Exception, headerAccessor: SimpMessageHeaderAccessor) {
-        println("🚨 $e")
+        print("🚨 $e")
+        e.printStackTrace()
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
         val e = MessageError.INTERNAL_SERVER_ERROR
         return messagingTemplate.convertAndSend(

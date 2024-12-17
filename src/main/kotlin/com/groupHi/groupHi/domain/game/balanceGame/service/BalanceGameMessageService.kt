@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
-class BalanceGameService(
+class BalanceGameMessageService(
     private val roomCacheService: RoomCacheService,
     private val balanceGameCacheService: BalanceGameCacheService
 ) {

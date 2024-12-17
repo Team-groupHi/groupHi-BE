@@ -5,15 +5,14 @@ import com.groupHi.groupHi.global.exception.error.MessageError
 
 data class MessageResponse(
     val type: MessageType,
-    val sender: String,
-    val content: Any?
+    val sender: String? = "System",
+    val content: Any? = null
 ) {
 
     companion object {
         fun error(error: MessageError): MessageResponse {
             return MessageResponse(
                 type = MessageType.ERROR,
-                sender = "System",
                 content = MessageErrorResponse.from(error)
             )
         }
