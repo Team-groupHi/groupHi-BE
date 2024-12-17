@@ -11,8 +11,9 @@ enum class MessageError(
     // Room
     GAME_NOT_FOUND("R001", "Sorry, the game you are trying to play is unavailable."),
     ROOM_NOT_FOUND("R002", "We couldn’t find the room you’re looking for."),
-    ONLY_HOST_CAN_CHANGE_GAME("R003", "Only the host can change the game."),
-    NAME_CHANGE_NOT_ALLOWED("R004", "Name changes are only allowed in the ready state."),
+    INVALID_NAME("R003", "Please use a different name."),
+    ONLY_HOST_CAN_CHANGE_GAME("R004", "Only the host can change the game."),
+    NAME_CHANGE_NOT_ALLOWED("R005", "Name changes are only allowed in the ready state."),
 
     // BalanceGame
     ONLY_HOST_CAN_START("B001", "Only the host can start the game."),

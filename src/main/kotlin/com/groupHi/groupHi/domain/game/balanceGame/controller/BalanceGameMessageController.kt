@@ -13,7 +13,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations
 import org.springframework.stereotype.Controller
 
 @Controller
-class BalanceGameMessageController( //TODO: refactor, timer
+class BalanceGameMessageController( //TODO: refactor
     private val messagingTemplate: SimpMessageSendingOperations,
     private val balanceGameMessageService: BalanceGameMessageService
 ) {
@@ -29,7 +29,6 @@ class BalanceGameMessageController( //TODO: refactor, timer
             "/sub/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_START,
-                sender = "System",
                 content = balanceGameMessageService.start(roomId!!, name, request.theme, request.totalRounds)
             )
         )
@@ -47,8 +46,7 @@ class BalanceGameMessageController( //TODO: refactor, timer
             "/sub/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_SELECT,
-                sender = "System",
-                content = "$name has selected."
+                sender = name,
             )
         )
     }
@@ -65,8 +63,7 @@ class BalanceGameMessageController( //TODO: refactor, timer
             "/sub/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_SELECT,
-                sender = "System",
-                content = "$name has selected."
+                sender = name
             )
         )
     }
@@ -83,8 +80,7 @@ class BalanceGameMessageController( //TODO: refactor, timer
             "/sub/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_UNSELECT,
-                sender = "System",
-                content = "$name has unselected."
+                sender = name
             )
         )
     }
@@ -97,7 +93,6 @@ class BalanceGameMessageController( //TODO: refactor, timer
             "/sub/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_NEXT,
-                sender = "System",
                 content = balanceGameMessageService.next(roomId!!, name)
             )
         )
@@ -110,11 +105,7 @@ class BalanceGameMessageController( //TODO: refactor, timer
         balanceGameMessageService.end(roomId!!, name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
-            MessageResponse(
-                type = MessageType.BG_END,
-                sender = "System",
-                content = "Return to the waiting room."
-            )
+            MessageResponse( MessageType.BG_END)
         )
     }
 }
