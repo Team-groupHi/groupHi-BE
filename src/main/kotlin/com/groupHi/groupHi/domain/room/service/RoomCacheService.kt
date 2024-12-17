@@ -25,7 +25,9 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) {
     fun createRoom(id: String, gameId: String) {
         redisTemplate.opsForHash<String, RoomStatus>().put(id, "status", RoomStatus.WAITING)
         redisTemplate.opsForHash<String, String>().put(id, "gameId", gameId)
+        redisTemplate.opsForSet().add("$id:avatars", "blue", "green", "mint", "orange", "pink", "purple", "red", "yellow")
         redisTemplate.expire(id, 1, TimeUnit.HOURS)
+        redisTemplate.expire("$id:avatars", 1, TimeUnit.HOURS)
     }
 
     fun getRoom(id: String): RoomResponse {
@@ -69,21 +71,29 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) {
             }
     }
 
-    fun enterRoom(id: String, name: String) {
+    fun enterRoom(id: String, name: String): String {
         val isHost = redisTemplate.opsForHash<String, String>().get(id, "hostName") == null
         if (isHost) {
             redisTemplate.opsForHash<String, String>().put(id, "hostName", name)
             redisTemplate.expire(id, 1, TimeUnit.HOURS)
         }
+        if(redisTemplate.opsForHash<String, Boolean>().size("$id:players") >= 8) {
+            throw MessageException(MessageError.ROOM_FULL)
+        }
         redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, isHost)
+        return redisTemplate.opsForSet().pop("$id:avatars") as String
     }
 
-    fun exitRoom(id: String, name: String) {
+    fun exitRoom(id: String, name: String, avatar: String?) {
         if (!isHost(id, name)) {
             redisTemplate.delete(id)
             redisTemplate.delete("$id:players")
+            redisTemplate.delete("$id:avatars")
         }
         redisTemplate.opsForHash<String, Boolean>().delete("$id:players", name)
+        if (avatar != null) {
+            redisTemplate.opsForSet().add("$id:avatars", avatar)
+        }
     }
 
     fun ready(id: String, name: String) {

@@ -12,15 +12,13 @@ class RoomMessageService(
     private val gameRepository: GameRepository
 ) {
 
-    fun enterRoom(roomId: String, name: String) {
+    fun enterRoom(roomId: String, name: String): String {
         validateName(roomId, name)
-        roomCacheService.enterRoom(roomId, name)
-        //TODO: 프로필 컬러 지정 및 리턴
+        return roomCacheService.enterRoom(roomId, name)
     }
 
-    fun exitRoom(roomId: String, name: String) {
-        //TODO: 프로필 컬러 해제
-        roomCacheService.exitRoom(roomId, name)
+    fun exitRoom(roomId: String, name: String, avatar: String?) {
+        roomCacheService.exitRoom(roomId, name, avatar)
     }
 
     fun ready(roomId: String, name: String) {
