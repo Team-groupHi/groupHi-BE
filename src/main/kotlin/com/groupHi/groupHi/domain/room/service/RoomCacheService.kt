@@ -18,6 +18,10 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) {
         return redisTemplate.opsForHash<String, RoomStatus>().get(id, "status") == RoomStatus.PLAYING
     }
 
+    fun isNameExist(id: String, name: String): Boolean {
+        return redisTemplate.opsForHash<String, Boolean>().hasKey("$id:players", name)
+    }
+
     fun createRoom(id: String, gameId: String) {
         redisTemplate.opsForHash<String, RoomStatus>().put(id, "status", RoomStatus.WAITING)
         redisTemplate.opsForHash<String, String>().put(id, "gameId", gameId)

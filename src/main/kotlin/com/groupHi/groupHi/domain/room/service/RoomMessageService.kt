@@ -13,7 +13,7 @@ class RoomMessageService(
 ) {
 
     fun enterRoom(roomId: String, name: String) {
-        //TODO: 닉네임 중복 체크
+        validateName(roomId, name)
         roomCacheService.enterRoom(roomId, name)
         //TODO: 프로필 컬러 지정 및 리턴
     }
@@ -43,5 +43,11 @@ class RoomMessageService(
             throw MessageException(MessageError.NAME_CHANGE_NOT_ALLOWED)
         }
         roomCacheService.changePlayerName(roomId, name, newName)
+    }
+
+    private fun validateName(roomId: String, name: String) {
+        if (name == "System" || roomCacheService.isNameExist(roomId, name)) {
+            throw MessageException(MessageError.INVALID_NAME)
+        }
     }
 }
