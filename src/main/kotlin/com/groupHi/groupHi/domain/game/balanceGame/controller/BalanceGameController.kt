@@ -1,7 +1,7 @@
 package com.groupHi.groupHi.domain.game.balanceGame.controller
 
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameResultGetResponse
-import com.groupHi.groupHi.domain.game.balanceGame.service.BalanceGameService
+import com.groupHi.groupHi.domain.game.balanceGame.service.BalanceGameMessageService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.GetMapping
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "BalanceGame")
 @RestController
 @RequestMapping("/api/v1/games")
-class BalanceGameController(private val balanceGameService: BalanceGameService) {
+class BalanceGameController(private val balanceGameMessageService: BalanceGameMessageService) {
 
     @Operation(summary = "밸런스 게임 결과 조회", description = "round가 주어지지 않으면 모든 라운드의 결과를 반환합니다.")
     @GetMapping("/balance-game/results")
@@ -20,6 +20,6 @@ class BalanceGameController(private val balanceGameService: BalanceGameService) 
         @RequestParam roomId: String,
         @RequestParam(required = false) round: Int?
     ): List<BalanceGameResultGetResponse> {
-        return balanceGameService.getBalanceGameResults(roomId, round)
+        return balanceGameMessageService.getBalanceGameResults(roomId, round)
     }
 }
