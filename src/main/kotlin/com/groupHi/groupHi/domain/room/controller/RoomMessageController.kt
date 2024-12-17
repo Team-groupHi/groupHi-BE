@@ -46,7 +46,7 @@ class RoomMessageController( //TODO: refactor
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
         val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
         val avatar = headerAccessor.sessionAttributes?.get("avatar") as? String
-        roomMessageService.exitRoom(roomId!!, name, avatar) //TODO: 방장 나가면 방 폭바
+        roomMessageService.exitRoom(roomId!!, name, avatar)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
