@@ -1,11 +1,16 @@
 package com.groupHi.groupHi.domain.room.service
 
+import com.groupHi.groupHi.domain.game.dto.response.GameGetResponse
+import com.groupHi.groupHi.domain.game.repository.GameRepository
 import com.groupHi.groupHi.global.exception.error.MessageError
 import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.stereotype.Service
 
 @Service
-class RoomMessageService(private val roomCacheService: RoomCacheService) {
+class RoomMessageService(
+    private val roomCacheService: RoomCacheService,
+    private val gameRepository: GameRepository
+) {
 
     fun enterRoom(roomId: String, name: String) {
         //TODO: 닉네임 중복 체크
@@ -26,9 +31,11 @@ class RoomMessageService(private val roomCacheService: RoomCacheService) {
         roomCacheService.unready(roomId, name)
     }
 
-    fun changeGame(roomId: String, name: String, gameId: String) {
-        //TODO: 게임 정보 리턴
-        roomCacheService.changeGame(roomId, name, gameId)
+    fun changeGame(roomId: String, name: String, gameId: String): GameGetResponse {
+        val game = gameRepository.findById(gameId)
+            .orElseThrow { MessageException(MessageError.GAME_NOT_FOUND) }
+        roomCacheService.changeGame(roomId, name, game.id)
+        return GameGetResponse.from(game)
     }
 
     fun changePlayerName(roomId: String, name: String, newName: String) {
