@@ -1,8 +1,10 @@
 package com.groupHi.groupHi.global.config
 
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.messaging.simp.config.MessageBrokerRegistry
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer
@@ -17,6 +19,17 @@ class WebSocketConfig(@Value("\${allowed-origins}") private val allowedOrigins: 
 
     override fun configureMessageBroker(registry: MessageBrokerRegistry) {
         registry.enableSimpleBroker("/sub")
+            .setHeartbeatValue(longArrayOf(10000, 10000))
+            .setTaskScheduler(taskScheduler())
         registry.setApplicationDestinationPrefixes("/pub")
+    }
+
+    @Bean
+    fun taskScheduler(): ThreadPoolTaskScheduler {
+        val scheduler = ThreadPoolTaskScheduler()
+        scheduler.poolSize = 1
+        scheduler.setThreadNamePrefix("WebSocket-Heartbeat-")
+        scheduler.initialize()
+        return scheduler
     }
 }
