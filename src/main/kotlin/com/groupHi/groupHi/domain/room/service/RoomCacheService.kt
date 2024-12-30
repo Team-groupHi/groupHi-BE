@@ -85,7 +85,7 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) {
     }
 
     fun exitRoom(id: String, name: String, avatar: String?) {
-        if (!isHost(id, name)) {
+        if (isHost(id, name)) {
             redisTemplate.delete(id)
             redisTemplate.delete("$id:players")
             redisTemplate.delete("$id:avatars")
