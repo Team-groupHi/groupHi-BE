@@ -25,14 +25,16 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) {
     fun createRoom(id: String, gameId: String) {
         redisTemplate.opsForHash<String, RoomStatus>().put(id, "status", RoomStatus.WAITING)
         redisTemplate.opsForHash<String, String>().put(id, "gameId", gameId)
-        redisTemplate.opsForSet().add("$id:avatars", "blue", "green", "mint", "orange", "pink", "purple", "red", "yellow")
+        redisTemplate.opsForSet()
+            .add("$id:avatarPool", "blue", "green", "mint", "orange", "pink", "purple", "red", "yellow")
         redisTemplate.expire(id, 1, TimeUnit.HOURS)
-        redisTemplate.expire("$id:avatars", 1, TimeUnit.HOURS)
+        redisTemplate.expire("$id:avatarPool", 1, TimeUnit.HOURS)
     }
 
     fun getRoom(id: String): RoomResponse {
         val room = redisTemplate.opsForHash<String, Any>().entries(id)
         val players = getPlayers(id)
+        val avatarRegistry = redisTemplate.opsForHash<String, String>().entries("$id:avatarRegistry")
         return RoomResponse(
             id = id,
             status = room["status"] as RoomStatus,
@@ -41,7 +43,8 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) {
             players = players.map { (name, isReady) ->
                 PlayerResponse(
                     name = name,
-                    isReady = isReady as Boolean
+                    isReady = isReady as Boolean,
+                    avatar = avatarRegistry[name] ?: ""
                 )
             }
         )
@@ -62,37 +65,46 @@ class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) {
 
 
     fun getPlayers(id: String): List<PlayerResponse> {
-        return redisTemplate.opsForHash<String, Boolean>().entries("$id:players")
-            .map { (name, isReady) ->
-                PlayerResponse(
-                    name = name,
-                    isReady = isReady
-                )
-            }
+        val players = redisTemplate.opsForHash<String, Boolean>().entries("$id:players")
+        val avatarRegistry = redisTemplate.opsForHash<String, String>().entries("$id:avatarRegistry")
+        return players.map { (name, isReady) ->
+            PlayerResponse(
+                name = name,
+                isReady = isReady,
+                avatar = avatarRegistry[name] ?: ""
+            )
+        }
     }
 
     fun enterRoom(id: String, name: String): String {
+        if (redisTemplate.opsForHash<String, Boolean>().size("$id:players") >= 8) {
+            throw MessageException(MessageError.ROOM_FULL)
+        }
+
+        val avatar = redisTemplate.opsForSet().pop("$id:avatarPool") as String
+        redisTemplate.opsForHash<String, String>().put("$id:avatarRegistry", name, avatar)
+
         val isHost = redisTemplate.opsForHash<String, String>().get(id, "hostName") == null
         if (isHost) {
             redisTemplate.opsForHash<String, String>().put(id, "hostName", name)
-            redisTemplate.expire(id, 1, TimeUnit.HOURS)
-        }
-        if(redisTemplate.opsForHash<String, Boolean>().size("$id:players") >= 8) {
-            throw MessageException(MessageError.ROOM_FULL)
+            redisTemplate.expire("$id:avatarRegistry", 1, TimeUnit.HOURS)
         }
         redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, isHost)
-        return redisTemplate.opsForSet().pop("$id:avatars") as String
+
+        return avatar
     }
 
-    fun exitRoom(id: String, name: String, avatar: String?) {
+    fun exitRoom(id: String, name: String, avatar: String) {
         if (isHost(id, name)) {
             redisTemplate.delete(id)
             redisTemplate.delete("$id:players")
-            redisTemplate.delete("$id:avatars")
+            redisTemplate.delete("$id:avatarPool")
+            redisTemplate.delete("$id:avatarRegistry")
+            return
         }
-        redisTemplate.opsForHash<String, Boolean>().delete("$id:players", name)
-        if (avatar != null) {
-            redisTemplate.opsForSet().add("$id:avatars", avatar)
+        if (isRoomExist(id)) {
+            redisTemplate.opsForHash<String, Boolean>().delete("$id:players", name)
+            redisTemplate.opsForSet().add("$id:avatarPool", avatar)
         }
     }
 
@@ -136,5 +148,6 @@ data class RoomResponse(
 
 data class PlayerResponse(
     val name: String,
-    val isReady: Boolean
+    val isReady: Boolean,
+    val avatar: String
 )

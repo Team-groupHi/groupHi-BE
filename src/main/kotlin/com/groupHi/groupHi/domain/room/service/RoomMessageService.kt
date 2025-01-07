@@ -17,7 +17,7 @@ class RoomMessageService(
         return roomCacheService.enterRoom(roomId, name)
     }
 
-    fun exitRoom(roomId: String, name: String, avatar: String?) {
+    fun exitRoom(roomId: String, name: String, avatar: String) {
         roomCacheService.exitRoom(roomId, name, avatar)
     }
 
