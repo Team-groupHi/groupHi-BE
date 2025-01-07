@@ -45,7 +45,7 @@ class RoomMessageController( //TODO: refactor
     fun exitRoom(headerAccessor: SimpMessageHeaderAccessor) {
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
         val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        val avatar = headerAccessor.sessionAttributes?.get("avatar") as? String
+        val avatar = headerAccessor.sessionAttributes?.get("avatar") as String
         roomMessageService.exitRoom(roomId!!, name, avatar)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
@@ -141,7 +141,7 @@ class RoomMessageController( //TODO: refactor
         val headerAccessor = StompHeaderAccessor.wrap(event.message)
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
         val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        val avatar = headerAccessor.sessionAttributes?.get("avatar") as? String
+        val avatar = headerAccessor.sessionAttributes?.get("avatar") as String
         roomMessageService.exitRoom(roomId!!, name, avatar)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
