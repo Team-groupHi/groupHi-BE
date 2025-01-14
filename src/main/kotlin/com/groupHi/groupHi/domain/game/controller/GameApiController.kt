@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "Game")
 @RestController
 @RequestMapping("/api/v1")
-class GameController(private val gameService: GameService) {
+class GameApiController(private val gameService: GameService) {
 
     @Operation(summary = "게임 목록 조회")
     @GetMapping("/games")
