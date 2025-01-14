@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "BalanceGame")
 @RestController
 @RequestMapping("/api/v1/games")
-class BalanceGameController(private val balanceGameMessageService: BalanceGameMessageService) {
+class BalanceGameApiController(private val balanceGameMessageService: BalanceGameMessageService) {
 
     @Operation(summary = "밸런스 게임 결과 조회", description = "round가 주어지지 않으면 모든 라운드의 결과를 반환합니다.")
     @GetMapping("/balance-game/results")
