@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*
 @Tag(name = "Room")
 @RestController
 @RequestMapping("/api/v1")
-class RoomController(private val roomService: RoomService) {
+class RoomApiController(private val roomService: RoomService) {
 
     @Operation(summary = "방 생성")
     @PostMapping("/rooms")

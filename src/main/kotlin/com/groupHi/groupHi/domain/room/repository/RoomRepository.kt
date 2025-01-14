@@ -1,4 +1,4 @@
-package com.groupHi.groupHi.domain.room.service
+package com.groupHi.groupHi.domain.room.repository
 
 import com.groupHi.groupHi.global.exception.error.MessageError
 import com.groupHi.groupHi.global.exception.exception.MessageException
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
 @Service
-class RoomCacheService(private val redisTemplate: RedisTemplate<String, Any>) {
+class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
     //TODO: 키값 상수화, 서비스 로직과 책임 명확히 나누어 가지도록 리팩터링하기
 
     fun isRoomExist(id: String): Boolean {
