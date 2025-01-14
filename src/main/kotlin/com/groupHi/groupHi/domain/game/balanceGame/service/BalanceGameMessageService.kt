@@ -5,6 +5,7 @@ import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameTheme
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameResultGetResponse
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameRoundResponse
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameSelectionsResponse
+import com.groupHi.groupHi.domain.game.balanceGame.repository.BalanceGameRepository
 import com.groupHi.groupHi.domain.room.repository.RoomRepository
 import com.groupHi.groupHi.domain.room.repository.RoomStatus
 import com.groupHi.groupHi.global.exception.error.MessageError
@@ -15,7 +16,7 @@ import java.time.LocalDateTime
 @Service
 class BalanceGameMessageService(
     private val roomRepository: RoomRepository,
-    private val balanceGameCacheService: BalanceGameCacheService
+    private val balanceGameRepository: BalanceGameRepository
 ) {
 
     fun start(roomId: String, name: String, theme: BalanceGameTheme, totalRounds: Int): BalanceGameRoundResponse {
@@ -31,10 +32,10 @@ class BalanceGameMessageService(
         }
         roomRepository.updateRoomStatus(roomId, RoomStatus.PLAYING)
 
-        balanceGameCacheService.init(roomId, theme, totalRounds)
-        balanceGameCacheService.increaseRound(roomId)
+        balanceGameRepository.init(roomId, theme, totalRounds)
+        balanceGameRepository.increaseRound(roomId)
 
-        val content = balanceGameCacheService.getContents(roomId).first()
+        val content = balanceGameRepository.getContents(roomId).first()
         return BalanceGameRoundResponse(
             totalRounds = totalRounds,
             currentRound = 1,
@@ -47,11 +48,11 @@ class BalanceGameMessageService(
     }
 
     fun select(roomId: String, name: String, round: Int, selection: BalanceGameSelection) {
-        balanceGameCacheService.select(roomId, name, round, selection)
+        balanceGameRepository.select(roomId, name, round, selection)
     }
 
     fun unselect(roomId: String, name: String, round: Int) {
-        balanceGameCacheService.unselect(roomId, name, round)
+        balanceGameRepository.unselect(roomId, name, round)
     }
 
     fun next(roomId: String, name: String): BalanceGameRoundResponse {
@@ -60,9 +61,9 @@ class BalanceGameMessageService(
             throw MessageException(MessageError.ONLY_HOST_CAN_NEXT)
         }
 
-        balanceGameCacheService.increaseRound(roomId)
-        val rounds = balanceGameCacheService.getRounds(roomId)
-        val content = balanceGameCacheService.getContents(roomId)[rounds.currentRound - 1]
+        balanceGameRepository.increaseRound(roomId)
+        val rounds = balanceGameRepository.getRounds(roomId)
+        val content = balanceGameRepository.getContents(roomId)[rounds.currentRound - 1]
         return BalanceGameRoundResponse(
             totalRounds = rounds.totalRounds,
             currentRound = rounds.currentRound,
@@ -81,12 +82,12 @@ class BalanceGameMessageService(
         }
         roomRepository.resetPlayerReady(roomId)
         roomRepository.updateRoomStatus(roomId, RoomStatus.WAITING)
-        balanceGameCacheService.clean(roomId)
+        balanceGameRepository.clean(roomId)
     }
 
     fun getBalanceGameResults(roomId: String, round: Int?): List<BalanceGameResultGetResponse> {
-        val contents = balanceGameCacheService.getContents(roomId)
-        val selections = balanceGameCacheService.getSelections(roomId)
+        val contents = balanceGameRepository.getContents(roomId)
+        val selections = balanceGameRepository.getSelections(roomId)
 
         return contents
             .filter { round == null || it.round == round }
