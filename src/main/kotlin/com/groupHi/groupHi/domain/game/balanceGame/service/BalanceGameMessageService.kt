@@ -5,8 +5,8 @@ import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameTheme
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameResultGetResponse
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameRoundResponse
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameSelectionsResponse
-import com.groupHi.groupHi.domain.room.service.RoomCacheService
-import com.groupHi.groupHi.domain.room.service.RoomStatus
+import com.groupHi.groupHi.domain.room.repository.RoomRepository
+import com.groupHi.groupHi.domain.room.repository.RoomStatus
 import com.groupHi.groupHi.global.exception.error.MessageError
 import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.stereotype.Service
@@ -14,12 +14,12 @@ import java.time.LocalDateTime
 
 @Service
 class BalanceGameMessageService(
-    private val roomCacheService: RoomCacheService,
+    private val roomRepository: RoomRepository,
     private val balanceGameCacheService: BalanceGameCacheService
 ) {
 
     fun start(roomId: String, name: String, theme: BalanceGameTheme, totalRounds: Int): BalanceGameRoundResponse {
-        val room = roomCacheService.getRoom(roomId)
+        val room = roomRepository.getRoom(roomId)
         if (room.hostName != name) {
             throw MessageException(MessageError.ONLY_HOST_CAN_START)
         }
@@ -29,7 +29,7 @@ class BalanceGameMessageService(
         if (totalRounds < 1 || totalRounds > 20) {
             throw MessageException(MessageError.INVALID_ROUND_COUNT)
         }
-        roomCacheService.updateRoomStatus(roomId, RoomStatus.PLAYING)
+        roomRepository.updateRoomStatus(roomId, RoomStatus.PLAYING)
 
         balanceGameCacheService.init(roomId, theme, totalRounds)
         balanceGameCacheService.increaseRound(roomId)
@@ -55,7 +55,7 @@ class BalanceGameMessageService(
     }
 
     fun next(roomId: String, name: String): BalanceGameRoundResponse {
-        val room = roomCacheService.getRoom(roomId)
+        val room = roomRepository.getRoom(roomId)
         if (room.hostName != name) {
             throw MessageException(MessageError.ONLY_HOST_CAN_NEXT)
         }
@@ -75,12 +75,12 @@ class BalanceGameMessageService(
     }
 
     fun end(roomId: String, name: String) {
-        val room = roomCacheService.getRoom(roomId)
+        val room = roomRepository.getRoom(roomId)
         if (room.hostName != name) {
             throw MessageException(MessageError.ONLY_HOST_CAN_END)
         }
-        roomCacheService.resetPlayerReady(roomId)
-        roomCacheService.updateRoomStatus(roomId, RoomStatus.WAITING)
+        roomRepository.resetPlayerReady(roomId)
+        roomRepository.updateRoomStatus(roomId, RoomStatus.WAITING)
         balanceGameCacheService.clean(roomId)
     }
 
