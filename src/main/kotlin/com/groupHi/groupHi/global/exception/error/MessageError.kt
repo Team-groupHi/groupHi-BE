@@ -13,9 +13,15 @@ enum class MessageError(
     ROOM_NOT_FOUND("R002", "We couldn’t find the room you’re looking for."),
     INVALID_NAME("R003", "Please use a different name."),
     ROOM_FULL("R004", "The room is full."),
+<<<<<<< Updated upstream
     ONLY_HOST_CAN_CHANGE_GAME("R005", "Only the host can change the game."),
     NAME_CHANGE_NOT_ALLOWED("R006", "Name changes are only allowed in the ready state."),
     ALREADY_PLAYING("R007", "The game is already in progress."),
+=======
+    DUPLICATE_NAME("R005", "The name is already in use."),
+    ONLY_HOST_CAN_CHANGE_GAME("R006", "Only the host can change the game."),
+    NAME_CHANGE_NOT_ALLOWED("R007", "Name changes are only allowed in the ready state."),
+>>>>>>> Stashed changes
 
     // BalanceGame
     ONLY_HOST_CAN_START("B001", "Only the host can start the game."),
