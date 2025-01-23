@@ -30,6 +30,9 @@ class BalanceGameMessageService(
         if (totalRounds < 1 || totalRounds > 20) {
             throw MessageException(MessageError.INVALID_ROUND_COUNT)
         }
+        if (room.status == RoomStatus.PLAYING) {
+            throw MessageException(MessageError.ALREADY_PLAYING)
+        }
         roomRepository.updateRoomStatus(roomId, RoomStatus.PLAYING)
 
         balanceGameRepository.init(roomId, theme, totalRounds)

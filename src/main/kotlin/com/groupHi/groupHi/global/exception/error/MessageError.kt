@@ -15,6 +15,7 @@ enum class MessageError(
     ROOM_FULL("R004", "The room is full."),
     ONLY_HOST_CAN_CHANGE_GAME("R005", "Only the host can change the game."),
     NAME_CHANGE_NOT_ALLOWED("R006", "Name changes are only allowed in the ready state."),
+    ALREADY_PLAYING("R007", "The game is already in progress."),
 
     // BalanceGame
     ONLY_HOST_CAN_START("B001", "Only the host can start the game."),
