@@ -41,6 +41,10 @@ class RoomService(
         )
     }
 
+    fun validateName(roomId: String, name: String): Boolean {
+        return !roomRepository.isNameExist(roomId, name)
+    }
+
     private fun generateRoomId(): String {
         val charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
         while (true) {

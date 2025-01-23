@@ -80,6 +80,9 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         if (redisTemplate.opsForHash<String, Boolean>().size("$id:players") >= 8) {
             throw MessageException(MessageError.ROOM_FULL)
         }
+        if (isNameExist(id, name)) {
+            throw MessageException(MessageError.INVALID_NAME)
+        }
 
         val avatar = redisTemplate.opsForSet().pop("$id:avatarPool") as String
         redisTemplate.opsForHash<String, String>().put("$id:avatarRegistry", name, avatar)
