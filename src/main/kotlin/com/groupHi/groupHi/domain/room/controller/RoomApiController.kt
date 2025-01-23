@@ -23,4 +23,12 @@ class RoomApiController(private val roomService: RoomService) {
     fun getRoom(@PathVariable roomId: String): RoomGetResponse {
         return roomService.getRoom(roomId)
     }
+
+    @Operation(summary = "닉네임 중복 체크")
+    @PostMapping("/rooms/{roomId}")
+    fun validateName(@PathVariable roomId: String, @RequestBody request: NameValidateRequest): Boolean {
+        return roomService.validateName(roomId, request.name)
+    }
 }
+
+data class NameValidateRequest(val name: String)
