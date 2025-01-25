@@ -58,12 +58,18 @@ class BalanceGameMessageService(
         balanceGameRepository.unselect(roomId, name, round)
     }
 
+    fun isFinished(roomId: String): Boolean {
+        val rounds = balanceGameRepository.getRounds(roomId)
+        return rounds.currentRound >= rounds.totalRounds
+    }
+
     fun next(roomId: String, name: String): BalanceGameRoundResponse {
         val room = roomRepository.getRoom(roomId)
         if (room.hostName != name) {
             throw MessageException(MessageError.ONLY_HOST_CAN_NEXT)
         }
 
+        //TODO: 리팩터링 시 마지막 라운드 요청에 대한 방지 처리 필요
         balanceGameRepository.increaseRound(roomId)
         val rounds = balanceGameRepository.getRounds(roomId)
         val content = balanceGameRepository.getContents(roomId)[rounds.currentRound - 1]

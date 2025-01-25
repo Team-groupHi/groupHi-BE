@@ -87,13 +87,22 @@ class BalanceGameMessageController( //TODO: refactor
 
     @MessageMapping("/games/balance-game/next")
     fun next(headerAccessor: SimpMessageHeaderAccessor) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
+
+        if (balanceGameMessageService.isFinished(roomId)) {
+            messagingTemplate.convertAndSend(
+                "/sub/rooms/$roomId",
+                MessageResponse(MessageType.BG_ALL_RESULTS)
+            )
+            return
+        }
+
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_NEXT,
-                content = balanceGameMessageService.next(roomId!!, name)
+                content = balanceGameMessageService.next(roomId, name)
             )
         )
     }
@@ -105,7 +114,7 @@ class BalanceGameMessageController( //TODO: refactor
         balanceGameMessageService.end(roomId!!, name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
-            MessageResponse( MessageType.BG_END)
+            MessageResponse(MessageType.BG_END)
         )
     }
 }
