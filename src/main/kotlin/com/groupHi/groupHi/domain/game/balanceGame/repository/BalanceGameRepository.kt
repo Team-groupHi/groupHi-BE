@@ -51,7 +51,7 @@ class BalanceGameRepository(
     fun getContents(roomId: String): List<ContentResponse> {
         val contents = redisTemplate.opsForHash<String, String>().entries("bg:$roomId:contents")
         val groupedContents = contents.entries.groupBy { entry ->
-            entry.key.split(":")[1]
+            entry.key.split(":")[1].toInt()
         }
         return groupedContents.toSortedMap().map { (round, entries) ->
             val q = entries.find { it.key.startsWith("q:") }?.value ?: ""
@@ -85,7 +85,7 @@ class BalanceGameRepository(
     fun getSelections(roomId: String): List<SelectionsResponse> {
         val selections = redisTemplate.opsForHash<String, BalanceGameSelection>().entries("bg:$roomId:selections")
         val groupedSelections = selections.entries.groupBy { entry ->
-            entry.key.split(":")[1]
+            entry.key.split(":")[1].toInt()
         }
         return groupedSelections.toSortedMap().map { (round, entries) ->
             val a = entries.filter { it.value == BalanceGameSelection.A }.map { it.key.split(":")[0] }
