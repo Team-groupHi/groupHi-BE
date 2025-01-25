@@ -43,7 +43,7 @@ class BalanceGameRepository(
 
     fun increaseRound(roomId: String) {
         val rounds = getRounds(roomId)
-        if (rounds.currentRound < rounds.totalRounds) {
+        if (rounds.currentRound < rounds.totalRounds) { //TODO: 분기문 분리
             redisTemplate.opsForValue().set("bg:$roomId:rounds", "${rounds.currentRound + 1}/${rounds.totalRounds}")
         }
     }

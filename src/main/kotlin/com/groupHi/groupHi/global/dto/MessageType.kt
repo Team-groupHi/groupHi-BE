@@ -17,5 +17,6 @@ enum class MessageType {
     BG_SELECT,
     BG_UNSELECT,
     BG_NEXT,
+    BG_ALL_RESULTS,
     BG_END,
 }
