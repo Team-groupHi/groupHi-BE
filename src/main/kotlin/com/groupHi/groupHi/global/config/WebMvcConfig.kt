@@ -11,6 +11,6 @@ class WebMvcConfig(@Value("\${allowed-origins}") private val allowedOrigins: Str
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**")
             .allowedOrigins(allowedOrigins)
-            .allowedMethods("GET", "POST")
+            .allowedMethods("GET", "POST", "OPTIONS")
     }
 }
