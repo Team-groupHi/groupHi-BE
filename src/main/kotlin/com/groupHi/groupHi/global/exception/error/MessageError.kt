@@ -16,6 +16,7 @@ enum class MessageError(
     ONLY_HOST_CAN_CHANGE_GAME("R005", "Only the host can change the game."),
     NAME_CHANGE_NOT_ALLOWED("R006", "Name changes are only allowed in the ready state."),
     ALREADY_PLAYING("R007", "The game is already in progress."),
+    NOT_ENOUGH_PLAYERS("R008", "You need at least two players to start the game."),
 
     // BalanceGame
     ONLY_HOST_CAN_START("B001", "Only the host can start the game."),

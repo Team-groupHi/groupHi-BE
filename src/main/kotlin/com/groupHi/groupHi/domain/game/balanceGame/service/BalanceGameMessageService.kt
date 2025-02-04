@@ -24,6 +24,9 @@ class BalanceGameMessageService(
         if (room.hostName != name) {
             throw MessageException(MessageError.ONLY_HOST_CAN_START)
         }
+        if (room.players.size < 2) {
+            throw MessageException(MessageError.NOT_ENOUGH_PLAYERS)
+        }
         if (room.players.any { !it.isReady }) {
             throw MessageException(MessageError.NOT_ALL_PLAYERS_READY)
         }
