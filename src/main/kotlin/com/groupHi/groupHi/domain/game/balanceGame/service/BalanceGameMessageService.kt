@@ -43,7 +43,7 @@ class BalanceGameMessageService(
             totalRounds = totalRounds,
             currentRound = 1,
             startTime = LocalDateTime.now(),
-            endTime = LocalDateTime.now().plusSeconds(30),
+            endTime = LocalDateTime.now().plusSeconds(10), //TODO: 시간 상수화 or 설정값으로 변경
             q = content.q,
             a = content.a,
             b = content.b
@@ -77,7 +77,7 @@ class BalanceGameMessageService(
             totalRounds = rounds.totalRounds,
             currentRound = rounds.currentRound,
             startTime = LocalDateTime.now(),
-            endTime = LocalDateTime.now().plusSeconds(30),
+            endTime = LocalDateTime.now().plusSeconds(10), //TODO: 시간 상수화 or 설정값으로 변경
             q = content.q,
             a = content.a,
             b = content.b
