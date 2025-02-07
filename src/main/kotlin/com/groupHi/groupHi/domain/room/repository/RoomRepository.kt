@@ -1,5 +1,6 @@
 package com.groupHi.groupHi.domain.room.repository
 
+import com.groupHi.groupHi.domain.room.dto.response.RoomResponse
 import com.groupHi.groupHi.domain.room.entity.Room
 import com.groupHi.groupHi.domain.room.entity.RoomStatus
 import com.groupHi.groupHi.global.exception.error.MessageError
@@ -29,7 +30,8 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         redisTemplate.opsForHash<String, String>().put(room.id, "gameId", room.gameId)
         redisTemplate.expire(room.id, 1, TimeUnit.HOURS)
 
-        redisTemplate.opsForSet().add("${room.id}:avatarPool", "blue", "green", "mint", "orange", "pink", "purple", "red", "yellow")
+        redisTemplate.opsForSet()
+            .add("${room.id}:avatarPool", "blue", "green", "mint", "orange", "pink", "purple", "red", "yellow")
         redisTemplate.expire("${room.id}:avatarPool", 1, TimeUnit.HOURS)
 
         return room
@@ -145,14 +147,6 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         return redisTemplate.opsForHash<String, String>().get(id, "hostName") == name
     }
 }
-
-data class RoomResponse(
-    val id: String,
-    val status: RoomStatus,
-    val gameId: String,
-    val hostName: String?,
-    val players: List<PlayerResponse>
-)
 
 data class PlayerResponse(
     val name: String,
