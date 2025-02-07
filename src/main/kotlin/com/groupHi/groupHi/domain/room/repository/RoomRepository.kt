@@ -1,5 +1,6 @@
 package com.groupHi.groupHi.domain.room.repository
 
+import com.groupHi.groupHi.domain.room.dto.response.PlayerResponse
 import com.groupHi.groupHi.domain.room.dto.response.RoomResponse
 import com.groupHi.groupHi.domain.room.entity.Room
 import com.groupHi.groupHi.domain.room.entity.RoomStatus
@@ -49,7 +50,7 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
             players = players.map { (name, isReady) ->
                 PlayerResponse(
                     name = name,
-                    isReady = isReady as Boolean,
+                    isReady = isReady,
                     avatar = avatarRegistry[name] ?: ""
                 )
             }
@@ -147,9 +148,3 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         return redisTemplate.opsForHash<String, String>().get(id, "hostName") == name
     }
 }
-
-data class PlayerResponse(
-    val name: String,
-    val isReady: Boolean,
-    val avatar: String
-)
