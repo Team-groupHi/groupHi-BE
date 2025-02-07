@@ -1,5 +1,6 @@
 package com.groupHi.groupHi.domain.room.repository
 
+import com.groupHi.groupHi.domain.room.entity.Room
 import com.groupHi.groupHi.global.exception.error.MessageError
 import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.data.redis.core.RedisTemplate
@@ -22,13 +23,15 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         return redisTemplate.opsForHash<String, Boolean>().hasKey("$id:players", name)
     }
 
-    fun createRoom(id: String, gameId: String) {
-        redisTemplate.opsForHash<String, RoomStatus>().put(id, "status", RoomStatus.WAITING)
-        redisTemplate.opsForHash<String, String>().put(id, "gameId", gameId)
-        redisTemplate.opsForSet()
-            .add("$id:avatarPool", "blue", "green", "mint", "orange", "pink", "purple", "red", "yellow")
-        redisTemplate.expire(id, 1, TimeUnit.HOURS)
-        redisTemplate.expire("$id:avatarPool", 1, TimeUnit.HOURS)
+    fun saveRoom(room: Room): Room {
+        redisTemplate.opsForHash<String, RoomStatus>().put(room.id, "status", room.status)
+        redisTemplate.opsForHash<String, String>().put(room.id, "gameId", room.gameId)
+        redisTemplate.expire(room.id, 1, TimeUnit.HOURS)
+
+        redisTemplate.opsForSet().add("${room.id}:avatarPool", "blue", "green", "mint", "orange", "pink", "purple", "red", "yellow")
+        redisTemplate.expire("${room.id}:avatarPool", 1, TimeUnit.HOURS)
+
+        return room
     }
 
     fun getRoom(id: String): RoomResponse {
