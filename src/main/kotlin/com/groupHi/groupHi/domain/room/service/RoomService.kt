@@ -53,8 +53,8 @@ class RoomService(
         )
     }
 
-    fun validatePlayerName(roomId: String, name: String): Boolean {
-        return !playerRepository.existsByRoomIdAndName(roomId, name)
+    fun isValidPlayerName(roomId: String, name: String): Boolean {
+        return name != "System" && !playerRepository.existsByRoomIdAndName(roomId, name)
     }
 
     private fun generateUniqueRoomId(): String {
