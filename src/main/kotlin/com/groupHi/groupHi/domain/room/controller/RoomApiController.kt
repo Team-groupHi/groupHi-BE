@@ -28,6 +28,6 @@ class RoomApiController(private val roomService: RoomService) {
     @Operation(summary = "닉네임 중복 체크")
     @PostMapping("/rooms/{roomId}")
     fun validateName(@PathVariable roomId: String, @RequestBody request: RoomPlayerNameValidateRequest): Boolean {
-        return roomService.validateName(roomId, request.name)
+        return roomService.validatePlayerName(roomId, request.name)
     }
 }

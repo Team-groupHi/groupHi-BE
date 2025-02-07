@@ -2,6 +2,7 @@ package com.groupHi.groupHi.domain.room.service
 
 import com.groupHi.groupHi.domain.game.dto.response.GameGetResponse
 import com.groupHi.groupHi.domain.game.repository.GameRepository
+import com.groupHi.groupHi.domain.room.repository.PlayerRepository
 import com.groupHi.groupHi.domain.room.repository.RoomRepository
 import com.groupHi.groupHi.global.exception.error.MessageError
 import com.groupHi.groupHi.global.exception.exception.MessageException
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service
 @Service
 class RoomMessageService(
     private val roomRepository: RoomRepository,
+    private val playerRepository: PlayerRepository,
     private val gameRepository: GameRepository
 ) {
 
@@ -45,7 +47,7 @@ class RoomMessageService(
     }
 
     private fun validateName(roomId: String, name: String) {
-        if (name == "System" || roomRepository.isNameExist(roomId, name)) {
+        if (name == "System" || playerRepository.existsByRoomIdAndName(roomId, name)) {
             throw MessageException(MessageError.INVALID_NAME)
         }
     }

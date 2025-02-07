@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service
 @Service
 class PlayerRepository(private val redisTemplate: RedisTemplate<String, Player>) {
 
+    fun existsByRoomIdAndName(roomId: String, name: String): Boolean {
+        return redisTemplate.opsForHash<String, Boolean>().hasKey("$roomId:players", name)
+    }
+
     fun findAllByRoomId(roomId: String): List<Player> {
         val hostName = redisTemplate.opsForHash<String, String>().get(roomId, "hostName")
         val players = redisTemplate.opsForHash<String, Boolean>().entries("$roomId:players")

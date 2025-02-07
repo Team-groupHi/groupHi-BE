@@ -20,10 +20,6 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         return redisTemplate.opsForHash<String, RoomStatus>().get(id, "status") == RoomStatus.PLAYING
     }
 
-    fun isNameExist(id: String, name: String): Boolean {
-        return redisTemplate.opsForHash<String, Boolean>().hasKey("$id:players", name)
-    }
-
     fun save(room: Room): Room {
         redisTemplate.opsForHash<String, RoomStatus>().put(room.id, "status", room.status)
         redisTemplate.opsForHash<String, String>().put(room.id, "gameId", room.gameId)
@@ -66,9 +62,11 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         if (redisTemplate.opsForHash<String, Boolean>().size("$id:players") >= 8) {
             throw MessageException(MessageError.ROOM_FULL)
         }
-        if (isNameExist(id, name)) {
-            throw MessageException(MessageError.INVALID_NAME)
-        }
+
+        //TODO: 서비스 로직에서 체크
+//        if (isNameExist(id, name)) {
+//            throw MessageException(MessageError.INVALID_NAME)
+//        }
 
         val avatar = redisTemplate.opsForSet().pop("$id:avatarPool") as String
         redisTemplate.opsForHash<String, String>().put("$id:avatarRegistry", name, avatar)
