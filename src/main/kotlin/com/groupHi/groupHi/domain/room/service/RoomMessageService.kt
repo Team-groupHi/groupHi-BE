@@ -37,11 +37,11 @@ class RoomMessageService(
         return GameGetResponse.from(game)
     }
 
-    fun changePlayerName(roomId: String, name: String, newName: String) {
+    fun changePlayerName(roomId: String, name: String, newName: String, avatar: String) {
         if (roomRepository.isRoomPlaying(roomId)) {
             throw MessageException(MessageError.NAME_CHANGE_NOT_ALLOWED)
         }
-        roomRepository.changePlayerName(roomId, name, newName)
+        roomRepository.changePlayerName(roomId, name, newName, avatar)
     }
 
     private fun validateName(roomId: String, name: String) {
