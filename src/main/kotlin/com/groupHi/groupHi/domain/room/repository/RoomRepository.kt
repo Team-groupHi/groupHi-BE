@@ -1,7 +1,5 @@
 package com.groupHi.groupHi.domain.room.repository
 
-import com.groupHi.groupHi.domain.room.dto.response.PlayerResponse
-import com.groupHi.groupHi.domain.room.dto.response.RoomResponse
 import com.groupHi.groupHi.domain.room.entity.Room
 import com.groupHi.groupHi.domain.room.entity.RoomStatus
 import com.groupHi.groupHi.global.exception.error.MessageError
@@ -14,7 +12,7 @@ import java.util.concurrent.TimeUnit
 class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
     //TODO: 키값 상수화, 서비스 로직과 책임 명확히 나누어 가지도록 리팩터링하기
 
-    fun isRoomExist(id: String): Boolean {
+    fun existsById(id: String): Boolean {
         return redisTemplate.hasKey(id)
     }
 
@@ -26,7 +24,7 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         return redisTemplate.opsForHash<String, Boolean>().hasKey("$id:players", name)
     }
 
-    fun saveRoom(room: Room): Room {
+    fun save(room: Room): Room {
         redisTemplate.opsForHash<String, RoomStatus>().put(room.id, "status", room.status)
         redisTemplate.opsForHash<String, String>().put(room.id, "gameId", room.gameId)
         redisTemplate.expire(room.id, 1, TimeUnit.HOURS)
@@ -38,22 +36,16 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         return room
     }
 
-    fun getRoom(id: String): RoomResponse {
+    fun findById(id: String): Room? {
+        if (!existsById(id)) {
+            return null
+        }
+        
         val room = redisTemplate.opsForHash<String, Any>().entries(id)
-        val players = getPlayers(id)
-        val avatarRegistry = redisTemplate.opsForHash<String, String>().entries("$id:avatarRegistry")
-        return RoomResponse(
+        return Room(
             id = id,
             status = room["status"] as RoomStatus,
-            gameId = room["gameId"] as String,
-            hostName = room["hostName"] as String?,
-            players = players.map { (name, isReady) ->
-                PlayerResponse(
-                    name = name,
-                    isReady = isReady,
-                    avatar = avatarRegistry[name] ?: ""
-                )
-            }
+            gameId = room["gameId"] as String
         )
     }
 
@@ -68,19 +60,6 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
             .forEach { (name, _) ->
                 redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, false)
             }
-    }
-
-
-    fun getPlayers(id: String): List<PlayerResponse> {
-        val players = redisTemplate.opsForHash<String, Boolean>().entries("$id:players")
-        val avatarRegistry = redisTemplate.opsForHash<String, String>().entries("$id:avatarRegistry")
-        return players.map { (name, isReady) ->
-            PlayerResponse(
-                name = name,
-                isReady = isReady,
-                avatar = avatarRegistry[name] ?: ""
-            )
-        }
     }
 
     fun enterRoom(id: String, name: String): String {
@@ -112,7 +91,7 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
             redisTemplate.delete("$id:avatarRegistry")
             return
         }
-        if (isRoomExist(id)) {
+        if (existsById(id)) {
             redisTemplate.opsForHash<String, Boolean>().delete("$id:players", name)
             redisTemplate.opsForSet().add("$id:avatarPool", avatar)
         }

@@ -2,7 +2,7 @@ package com.groupHi.groupHi.domain.room.controller
 
 import com.groupHi.groupHi.domain.room.dto.request.RoomCreateRequest
 import com.groupHi.groupHi.domain.room.dto.request.RoomPlayerNameValidateRequest
-import com.groupHi.groupHi.domain.room.dto.response.RoomGetResponse
+import com.groupHi.groupHi.domain.room.dto.response.RoomResponse
 import com.groupHi.groupHi.domain.room.service.RoomService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -21,7 +21,7 @@ class RoomApiController(private val roomService: RoomService) {
 
     @Operation(summary = "방 상세 조회")
     @GetMapping("/rooms/{roomId}")
-    fun getRoom(@PathVariable roomId: String): RoomGetResponse {
+    fun getRoom(@PathVariable roomId: String): RoomResponse {
         return roomService.getRoom(roomId)
     }
 
