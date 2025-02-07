@@ -1,6 +1,7 @@
 package com.groupHi.groupHi.domain.room.repository
 
 import com.groupHi.groupHi.domain.room.entity.Room
+import com.groupHi.groupHi.domain.room.entity.RoomStatus
 import com.groupHi.groupHi.global.exception.error.MessageError
 import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.data.redis.core.RedisTemplate
@@ -143,11 +144,6 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
     fun isHost(id: String, name: String): Boolean {
         return redisTemplate.opsForHash<String, String>().get(id, "hostName") == name
     }
-}
-
-enum class RoomStatus {
-    WAITING,
-    PLAYING
 }
 
 data class RoomResponse(

@@ -5,8 +5,8 @@ import com.groupHi.groupHi.domain.game.repository.GameRepository
 import com.groupHi.groupHi.domain.room.dto.request.RoomCreateRequest
 import com.groupHi.groupHi.domain.room.dto.response.RoomGetResponse
 import com.groupHi.groupHi.domain.room.entity.Room
+import com.groupHi.groupHi.domain.room.entity.RoomStatus
 import com.groupHi.groupHi.domain.room.repository.RoomRepository
-import com.groupHi.groupHi.domain.room.repository.RoomStatus
 import com.groupHi.groupHi.global.exception.error.ApiError
 import com.groupHi.groupHi.global.exception.exception.ApiException
 import org.springframework.stereotype.Service

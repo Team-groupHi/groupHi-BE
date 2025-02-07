@@ -6,8 +6,8 @@ import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameResul
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameRoundResponse
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameSelectionsResponse
 import com.groupHi.groupHi.domain.game.balanceGame.repository.BalanceGameRepository
+import com.groupHi.groupHi.domain.room.entity.RoomStatus
 import com.groupHi.groupHi.domain.room.repository.RoomRepository
-import com.groupHi.groupHi.domain.room.repository.RoomStatus
 import com.groupHi.groupHi.global.exception.error.MessageError
 import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.stereotype.Service
