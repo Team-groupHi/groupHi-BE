@@ -1,6 +1,7 @@
 package com.groupHi.groupHi.domain.room.controller
 
 import com.groupHi.groupHi.domain.room.dto.request.RoomCreateRequest
+import com.groupHi.groupHi.domain.room.dto.request.RoomPlayerNameValidateRequest
 import com.groupHi.groupHi.domain.room.dto.response.RoomGetResponse
 import com.groupHi.groupHi.domain.room.service.RoomService
 import io.swagger.v3.oas.annotations.Operation
@@ -26,9 +27,7 @@ class RoomApiController(private val roomService: RoomService) {
 
     @Operation(summary = "닉네임 중복 체크")
     @PostMapping("/rooms/{roomId}")
-    fun validateName(@PathVariable roomId: String, @RequestBody request: NameValidateRequest): Boolean {
+    fun validateName(@PathVariable roomId: String, @RequestBody request: RoomPlayerNameValidateRequest): Boolean {
         return roomService.validateName(roomId, request.name)
     }
 }
-
-data class NameValidateRequest(val name: String)
