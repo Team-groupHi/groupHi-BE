@@ -27,9 +27,9 @@ class RoomMessageController( //TODO: refactor
         @Payload request: RoomEnterRequest,
         headerAccessor: SimpMessageHeaderAccessor
     ) {
+        val avatar = roomMessageService.enterRoom(request.roomId, request.name)
         headerAccessor.sessionAttributes?.set("roomId", request.roomId)
         headerAccessor.sessionAttributes?.set("name", request.name)
-        val avatar = roomMessageService.enterRoom(request.roomId, request.name)
         headerAccessor.sessionAttributes?.set("avatar", avatar)
         messagingTemplate.convertAndSend(
             "/sub/rooms/${request.roomId}",

@@ -58,27 +58,8 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
             }
     }
 
-    fun enterRoom(id: String, name: String): String {
-        if (redisTemplate.opsForHash<String, Boolean>().size("$id:players") >= 8) {
-            throw MessageException(MessageError.ROOM_FULL)
-        }
-
-        //TODO: 서비스 로직에서 체크
-//        if (isNameExist(id, name)) {
-//            throw MessageException(MessageError.INVALID_NAME)
-//        }
-
-        val avatar = redisTemplate.opsForSet().pop("$id:avatarPool") as String
-        redisTemplate.opsForHash<String, String>().put("$id:avatarRegistry", name, avatar)
-
-        val isHost = redisTemplate.opsForHash<String, String>().get(id, "hostName") == null
-        if (isHost) {
-            redisTemplate.opsForHash<String, String>().put(id, "hostName", name)
-            redisTemplate.expire("$id:avatarRegistry", 1, TimeUnit.HOURS)
-        }
-        redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, isHost)
-
-        return avatar
+    fun takeAvatar(id: String): String {
+        return redisTemplate.opsForSet().pop("$id:avatarPool") as String
     }
 
     fun exitRoom(id: String, name: String, avatar: String) {

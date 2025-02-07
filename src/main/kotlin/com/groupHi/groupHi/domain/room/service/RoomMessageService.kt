@@ -2,6 +2,8 @@ package com.groupHi.groupHi.domain.room.service
 
 import com.groupHi.groupHi.domain.game.dto.response.GameGetResponse
 import com.groupHi.groupHi.domain.game.repository.GameRepository
+import com.groupHi.groupHi.domain.room.entity.Player
+import com.groupHi.groupHi.domain.room.entity.RoomStatus
 import com.groupHi.groupHi.domain.room.repository.PlayerRepository
 import com.groupHi.groupHi.domain.room.repository.RoomRepository
 import com.groupHi.groupHi.global.exception.error.MessageError
@@ -16,8 +18,30 @@ class RoomMessageService(
 ) {
 
     fun enterRoom(roomId: String, name: String): String {
-        validateName(roomId, name)
-        return roomRepository.enterRoom(roomId, name)
+        val room = roomRepository.findById(roomId)
+            ?: throw MessageException(MessageError.ROOM_NOT_FOUND)
+
+        if (room.status == RoomStatus.PLAYING) {
+            throw MessageException(MessageError.ALREADY_PLAYING)
+        }
+        if (name == "System" || playerRepository.existsByRoomIdAndName(room.id, name)) {
+            throw MessageException(MessageError.INVALID_NAME)
+        }
+        if (playerRepository.countByRoomId(room.id) >= 8) {
+            throw MessageException(MessageError.ROOM_FULL)
+        }
+
+        val player = playerRepository.save(
+            room.id,
+            Player(
+                name = name,
+                avatar = roomRepository.takeAvatar(room.id),
+                isHost = room.hostName == null || room.hostName == name,
+                isReady = room.hostName == name
+            )
+        )
+
+        return player.avatar
     }
 
     fun exitRoom(roomId: String, name: String, avatar: String) {
@@ -44,11 +68,5 @@ class RoomMessageService(
             throw MessageException(MessageError.NAME_CHANGE_NOT_ALLOWED)
         }
         roomRepository.changePlayerName(roomId, name, newName, avatar)
-    }
-
-    private fun validateName(roomId: String, name: String) {
-        if (name == "System" || playerRepository.existsByRoomIdAndName(roomId, name)) {
-            throw MessageException(MessageError.INVALID_NAME)
-        }
     }
 }

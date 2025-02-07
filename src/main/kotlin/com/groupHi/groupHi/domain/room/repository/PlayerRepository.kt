@@ -3,12 +3,17 @@ package com.groupHi.groupHi.domain.room.repository
 import com.groupHi.groupHi.domain.room.entity.Player
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
+import java.util.concurrent.TimeUnit
 
 @Service
-class PlayerRepository(private val redisTemplate: RedisTemplate<String, Player>) {
+class PlayerRepository(private val redisTemplate: RedisTemplate<String, Any>) {
 
     fun existsByRoomIdAndName(roomId: String, name: String): Boolean {
         return redisTemplate.opsForHash<String, Boolean>().hasKey("$roomId:players", name)
+    }
+
+    fun countByRoomId(roomId: String): Long {
+        return redisTemplate.opsForHash<String, Boolean>().size("$roomId:players")
     }
 
     fun findAllByRoomId(roomId: String): List<Player> {
@@ -23,5 +28,17 @@ class PlayerRepository(private val redisTemplate: RedisTemplate<String, Player>)
                 isReady = isReady,
             )
         }
+    }
+
+    fun save(roomId: String, player: Player): Player {
+        redisTemplate.opsForHash<String, Boolean>().put("$roomId:players", player.name, player.isReady)
+        redisTemplate.opsForHash<String, String>().put("$roomId:avatarRegistry", player.name, player.avatar)
+
+        if (player.isHost) {
+            redisTemplate.opsForHash<String, String>().put(roomId, "hostName", player.name)
+            redisTemplate.expire("$roomId:avatarRegistry", 1, TimeUnit.HOURS)
+        }
+
+        return player
     }
 }
