@@ -59,4 +59,4 @@ jobs:
           actions: "create-comment"
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.issue.number }}
-          body: "Branch Created: \`GRPHI-${{ github.event.issue.number }}-${{ steps.issue-parser.outputs.jsonString }}/{{ github.event.issue.number }}\`"
+          body: "Branch Created: `GRPHI-${{ github.event.issue.number }}-${{ steps.issue-parser.outputs.jsonString }}/{{ github.event.issue.number }}`"
