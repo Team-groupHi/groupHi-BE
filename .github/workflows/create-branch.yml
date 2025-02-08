@@ -1,0 +1,62 @@
+name: GitHub Issue Workflow
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  create-issue:
+    name: GitHub Issue Workflow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Issue Parser
+        uses: stefanbuck/github-issue-parser@v3
+        id: issue-parser
+        with:
+          template-path: .github/ISSUE_TEMPLATE/issue-form.yml
+
+      - name: Log Issue Parser
+        run: |
+          echo "Branch Type: ${{ steps.issue-parser.outputs.jsonString }}"
+          echo "GitHub Issue Number: ${{ github.event.issue.number }}"
+          echo "Full Parsed JSON: ${{ steps.issue-parser.outputs.jsonString }}"
+
+      - name: Checkout dev code
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Create branch with formatted name
+        run: |
+          BRANCH_TYPE="$(echo '${{ steps.issue-parser.outputs.jsonString }}' | jq -r '.branch_type')"
+          GITHUB_ISSUE="${{ github.event.issue.number }}"
+          PROJECT_PREFIX="GRPHI"
+
+          echo "Branch Type: $BRANCH_TYPE"
+          echo "GitHub Issue: $GITHUB_ISSUE"
+
+          BRANCH_NAME="${PROJECT_PREFIX}-${GITHUB_ISSUE}-${BRANCH_TYPE}/${GITHUB_ISSUE}"
+          echo "Creating Branch: $BRANCH_NAME"
+
+          git checkout -b "${BRANCH_NAME}"
+          git push origin "${BRANCH_NAME}"
+
+      - name: Update issue title
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "update-issue"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "[${{ github.event.issue.number }}] ${{ github.event.issue.title }}"
+
+      - name: Add comment with Branch Info
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.issue.number }}
+          body: "Branch Created: \`GRPHI-${{ github.event.issue.number }}-${{ steps.issue-parser.outputs.jsonString }}/{{ github.event.issue.number }}\`"
