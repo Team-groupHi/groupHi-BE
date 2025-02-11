@@ -56,11 +56,11 @@ class RoomMessageService(
     }
 
     fun ready(roomId: String, name: String) {
-        roomRepository.ready(roomId, name)
+        playerRepository.updateReady(roomId, name, true)
     }
 
     fun unready(roomId: String, name: String) {
-        roomRepository.unready(roomId, name)
+        playerRepository.updateReady(roomId, name, false)
     }
 
     fun changeGame(roomId: String, name: String, gameId: String): GameGetResponse {

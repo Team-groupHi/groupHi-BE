@@ -69,14 +69,6 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         redisTemplate.delete("$id:avatarRegistry")
     }
 
-    fun ready(id: String, name: String) {
-        redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, true)
-    }
-
-    fun unready(id: String, name: String) {
-        redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, false)
-    }
-
     fun changeGame(id: String, name: String, gameId: String) {
         if (!isHost(id, name)) {
             throw MessageException(MessageError.ONLY_HOST_CAN_CHANGE_GAME)
