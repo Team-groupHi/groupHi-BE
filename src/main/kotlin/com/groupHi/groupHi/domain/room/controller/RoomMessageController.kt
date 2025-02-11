@@ -61,8 +61,8 @@ class RoomMessageController( //TODO: refactor
         @Payload request: RoomChatRequest,
         headerAccessor: SimpMessageHeaderAccessor
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
