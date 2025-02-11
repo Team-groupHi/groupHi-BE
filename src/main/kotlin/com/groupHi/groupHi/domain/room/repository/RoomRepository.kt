@@ -40,7 +40,7 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
             id = id,
             status = room["status"] as RoomStatus,
             gameId = room["gameId"] as String,
-            hostName = room["hostName"] as String
+            hostName = room["hostName"] as String?
         )
     }
 
