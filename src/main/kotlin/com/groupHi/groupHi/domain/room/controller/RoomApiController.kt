@@ -1,7 +1,8 @@
 package com.groupHi.groupHi.domain.room.controller
 
 import com.groupHi.groupHi.domain.room.dto.request.RoomCreateRequest
-import com.groupHi.groupHi.domain.room.dto.response.RoomGetResponse
+import com.groupHi.groupHi.domain.room.dto.request.RoomPlayerNameValidateRequest
+import com.groupHi.groupHi.domain.room.dto.response.RoomResponse
 import com.groupHi.groupHi.domain.room.service.RoomService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -20,15 +21,20 @@ class RoomApiController(private val roomService: RoomService) {
 
     @Operation(summary = "방 상세 조회")
     @GetMapping("/rooms/{roomId}")
-    fun getRoom(@PathVariable roomId: String): RoomGetResponse {
+    fun getRoom(@PathVariable roomId: String): RoomResponse {
         return roomService.getRoom(roomId)
     }
 
-    @Operation(summary = "닉네임 중복 체크")
+    //TODO: 삭제 예정
+    @Operation(summary = "닉네임 중복 체크", deprecated = true)
     @PostMapping("/rooms/{roomId}")
-    fun validateName(@PathVariable roomId: String, @RequestBody request: NameValidateRequest): Boolean {
-        return roomService.validateName(roomId, request.name)
+    fun validateName(@PathVariable roomId: String, @RequestBody request: RoomPlayerNameValidateRequest): Boolean {
+        return roomService.isValidPlayerName(roomId, request.name)
+    }
+
+    @Operation(summary = "닉네임 유효성 체크")
+    @PostMapping("/rooms/{roomId}/players/is-valid-name")
+    fun isValidPlayerName(@PathVariable roomId: String, @RequestBody request: RoomPlayerNameValidateRequest): Boolean {
+        return roomService.isValidPlayerName(roomId, request.name)
     }
 }
-
-data class NameValidateRequest(val name: String)

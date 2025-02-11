@@ -6,8 +6,9 @@ import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameResul
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameRoundResponse
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameSelectionsResponse
 import com.groupHi.groupHi.domain.game.balanceGame.repository.BalanceGameRepository
+import com.groupHi.groupHi.domain.room.entity.RoomStatus
 import com.groupHi.groupHi.domain.room.repository.RoomRepository
-import com.groupHi.groupHi.domain.room.repository.RoomStatus
+import com.groupHi.groupHi.domain.room.service.RoomService
 import com.groupHi.groupHi.global.exception.error.MessageError
 import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.stereotype.Service
@@ -15,12 +16,13 @@ import java.time.LocalDateTime
 
 @Service
 class BalanceGameMessageService(
+    private val roomService: RoomService,
     private val roomRepository: RoomRepository,
     private val balanceGameRepository: BalanceGameRepository
 ) {
 
     fun start(roomId: String, name: String, theme: BalanceGameTheme, totalRounds: Int): BalanceGameRoundResponse {
-        val room = roomRepository.getRoom(roomId)
+        val room = roomService.getRoom(roomId)
         if (room.hostName != name) {
             throw MessageException(MessageError.ONLY_HOST_CAN_START)
         }
@@ -67,7 +69,7 @@ class BalanceGameMessageService(
     }
 
     fun next(roomId: String, name: String): BalanceGameRoundResponse {
-        val room = roomRepository.getRoom(roomId)
+        val room = roomService.getRoom(roomId)
         if (room.hostName != name) {
             throw MessageException(MessageError.ONLY_HOST_CAN_NEXT)
         }
@@ -88,7 +90,7 @@ class BalanceGameMessageService(
     }
 
     fun end(roomId: String, name: String) {
-        val room = roomRepository.getRoom(roomId)
+        val room = roomService.getRoom(roomId)
         if (room.hostName != name) {
             throw MessageException(MessageError.ONLY_HOST_CAN_END)
         }

@@ -27,10 +27,9 @@ class RoomMessageController( //TODO: refactor
         @Payload request: RoomEnterRequest,
         headerAccessor: SimpMessageHeaderAccessor
     ) {
+        val avatar = roomMessageService.enterRoom(request.roomId, request.name)
         headerAccessor.sessionAttributes?.set("roomId", request.roomId)
         headerAccessor.sessionAttributes?.set("name", request.name)
-        val avatar = roomMessageService.enterRoom(request.roomId, request.name)
-        headerAccessor.sessionAttributes?.set("avatar", avatar)
         messagingTemplate.convertAndSend(
             "/sub/rooms/${request.roomId}",
             MessageResponse(
@@ -43,10 +42,9 @@ class RoomMessageController( //TODO: refactor
 
     @MessageMapping("/rooms/exit")
     fun exitRoom(headerAccessor: SimpMessageHeaderAccessor) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        val avatar = headerAccessor.sessionAttributes?.get("avatar") as String
-        roomMessageService.exitRoom(roomId!!, name, avatar)
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
+        roomMessageService.exitRoom(roomId, name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
@@ -61,8 +59,8 @@ class RoomMessageController( //TODO: refactor
         @Payload request: RoomChatRequest,
         headerAccessor: SimpMessageHeaderAccessor
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
@@ -75,9 +73,9 @@ class RoomMessageController( //TODO: refactor
 
     @MessageMapping("/rooms/ready")
     fun ready(headerAccessor: SimpMessageHeaderAccessor) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        roomMessageService.ready(roomId!!, name)
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
+        roomMessageService.ready(roomId, name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
@@ -89,9 +87,9 @@ class RoomMessageController( //TODO: refactor
 
     @MessageMapping("/rooms/unready")
     fun unready(headerAccessor: SimpMessageHeaderAccessor) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        roomMessageService.unready(roomId!!, name)
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
+        roomMessageService.unready(roomId, name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
@@ -106,13 +104,13 @@ class RoomMessageController( //TODO: refactor
         @Payload request: RoomGameChangeRequest,
         headerAccessor: SimpMessageHeaderAccessor
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
                 type = MessageType.CHANGE_GAME,
-                content = roomMessageService.changeGame(roomId!!, name, request.gameId)
+                content = roomMessageService.changeGame(roomId, name, request.gameId)
             )
         )
     }
@@ -122,10 +120,9 @@ class RoomMessageController( //TODO: refactor
         @Payload request: RoomPlayerNameChangeRequest,
         headerAccessor: SimpMessageHeaderAccessor
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        val avatar = headerAccessor.sessionAttributes?.get("avatar") as String
-        roomMessageService.changePlayerName(roomId!!, name, request.name, avatar)
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
+        roomMessageService.changePlayerName(roomId, name, request.name)
         headerAccessor.sessionAttributes?.set("name", request.name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
@@ -140,10 +137,9 @@ class RoomMessageController( //TODO: refactor
     @EventListener
     fun disconnectRoom(event: SessionDisconnectEvent) {
         val headerAccessor = StompHeaderAccessor.wrap(event.message)
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        val avatar = headerAccessor.sessionAttributes?.get("avatar") as String
-        roomMessageService.exitRoom(roomId!!, name, avatar)
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
+        roomMessageService.exitRoom(roomId, name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
