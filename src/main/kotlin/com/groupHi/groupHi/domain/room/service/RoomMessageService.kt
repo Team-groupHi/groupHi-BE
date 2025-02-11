@@ -36,8 +36,8 @@ class RoomMessageService(
             Player(
                 name = name,
                 avatar = roomRepository.takeAvatar(room.id),
-                isHost = room.hostName == null || room.hostName == name,
-                isReady = room.hostName == name
+                isHost = room.hostName == null,
+                isReady = room.hostName == null
             )
         )
 
