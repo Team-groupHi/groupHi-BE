@@ -62,18 +62,11 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         return redisTemplate.opsForSet().pop("$id:avatarPool") as String
     }
 
-    fun exitRoom(id: String, name: String, avatar: String) {
-        if (isHost(id, name)) {
-            redisTemplate.delete(id)
-            redisTemplate.delete("$id:players")
-            redisTemplate.delete("$id:avatarPool")
-            redisTemplate.delete("$id:avatarRegistry")
-            return
-        }
-        if (existsById(id)) {
-            redisTemplate.opsForHash<String, Boolean>().delete("$id:players", name)
-            redisTemplate.opsForSet().add("$id:avatarPool", avatar)
-        }
+    fun delete(id: String) {
+        redisTemplate.delete(id)
+        redisTemplate.delete("$id:players")
+        redisTemplate.delete("$id:avatarPool")
+        redisTemplate.delete("$id:avatarRegistry")
     }
 
     fun ready(id: String, name: String) {

@@ -41,4 +41,10 @@ class PlayerRepository(private val redisTemplate: RedisTemplate<String, Any>) {
 
         return player
     }
+
+    fun delete(roomId: String, name: String) {
+        val avatar = redisTemplate.opsForHash<String, String>().get("$roomId:avatarRegistry", name)
+        redisTemplate.opsForSet().add("$roomId:avatarPool", avatar)
+        redisTemplate.opsForHash<String, Boolean>().delete("$roomId:players", name)
+    }
 }

@@ -45,7 +45,14 @@ class RoomMessageService(
     }
 
     fun exitRoom(roomId: String, name: String, avatar: String) {
-        roomRepository.exitRoom(roomId, name, avatar)
+        val room = roomRepository.findById(roomId)
+        room?.let {
+            if (it.hostName == name) {
+                roomRepository.delete(it.id)
+            } else {
+                playerRepository.delete(it.id, name)
+            }
+        }
     }
 
     fun ready(roomId: String, name: String) {
