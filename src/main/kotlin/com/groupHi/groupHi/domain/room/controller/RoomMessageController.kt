@@ -122,10 +122,9 @@ class RoomMessageController( //TODO: refactor
         @Payload request: RoomPlayerNameChangeRequest,
         headerAccessor: SimpMessageHeaderAccessor
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        val avatar = headerAccessor.sessionAttributes?.get("avatar") as String
-        roomMessageService.changePlayerName(roomId!!, name, request.name, avatar)
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
+        roomMessageService.changePlayerName(roomId, name, request.name)
         headerAccessor.sessionAttributes?.set("name", request.name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",

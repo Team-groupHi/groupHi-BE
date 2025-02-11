@@ -51,4 +51,12 @@ class PlayerRepository(private val redisTemplate: RedisTemplate<String, Any>) {
     fun updateReady(roomId: String, name: String, isReady: Boolean) {
         redisTemplate.opsForHash<String, Boolean>().put("$roomId:players", name, isReady)
     }
+
+    fun updateName(roomId: String, name: String, newName: String) {
+        val avatar = redisTemplate.opsForHash<String, String>().get("$roomId:avatarRegistry", name)
+        redisTemplate.opsForHash<String, String>().delete("$roomId:avatarRegistry", name)
+        redisTemplate.opsForHash<String, String>().put("$roomId:avatarRegistry", newName, avatar!!)
+        redisTemplate.opsForHash<String, Boolean>().delete("$roomId:players", name)
+        redisTemplate.opsForHash<String, Boolean>().put("$roomId:players", newName, false)
+    }
 }

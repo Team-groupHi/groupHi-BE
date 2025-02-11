@@ -71,15 +71,8 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         redisTemplate.opsForHash<String, String>().put(id, "gameId", gameId)
     }
 
-    fun changePlayerName(id: String, name: String, newName: String, avatar: String) {
-        //TODO: 순서 보장하도록 아키텍처 구성 (ex. 닉네임 수정중인데, 게임 시작하면?)
-        if (isHost(id, name)) {
-            redisTemplate.opsForHash<String, String>().put(id, "hostName", newName)
-        }
-        redisTemplate.opsForHash<String, Boolean>().delete("$id:players", name)
-        redisTemplate.opsForHash<String, String>().delete("$id:avatarRegistry", name)
-        redisTemplate.opsForHash<String, Boolean>().put("$id:players", newName, false)
-        redisTemplate.opsForHash<String, String>().put("$id:avatarRegistry", newName, avatar)
+    fun updateHostName(id: String, name: String) {
+        redisTemplate.opsForHash<String, String>().put(id, "hostName", name)
     }
 
     fun isHost(id: String, name: String): Boolean {

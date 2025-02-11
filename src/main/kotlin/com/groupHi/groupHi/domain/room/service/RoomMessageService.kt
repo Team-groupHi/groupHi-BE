@@ -82,10 +82,21 @@ class RoomMessageService(
         return GameGetResponse.from(game)
     }
 
-    fun changePlayerName(roomId: String, name: String, newName: String, avatar: String) {
-        if (roomRepository.isRoomPlaying(roomId)) {
+    fun changePlayerName(roomId: String, name: String, newName: String) {
+        val room = roomRepository.findById(roomId)
+            ?: throw MessageException(MessageError.ROOM_NOT_FOUND)
+
+        if (room.status == RoomStatus.PLAYING) {
             throw MessageException(MessageError.NAME_CHANGE_NOT_ALLOWED)
         }
-        roomRepository.changePlayerName(roomId, name, newName, avatar)
+        if (playerRepository.existsByRoomIdAndName(room.id, newName)) {
+            throw MessageException(MessageError.INVALID_NAME)
+        }
+
+        playerRepository.updateName(roomId, name, newName)
+
+        if (room.hostName == name) {
+            roomRepository.updateHostName(roomId, newName)
+        }
     }
 }
