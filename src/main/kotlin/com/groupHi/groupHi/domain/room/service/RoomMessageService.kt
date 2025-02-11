@@ -44,7 +44,7 @@ class RoomMessageService(
         return player.avatar
     }
 
-    fun exitRoom(roomId: String, name: String, avatar: String) {
+    fun exitRoom(roomId: String, name: String) {
         val room = roomRepository.findById(roomId)
         room?.let {
             if (it.hostName == name) {
