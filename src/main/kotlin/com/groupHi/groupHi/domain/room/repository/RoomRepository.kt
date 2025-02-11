@@ -2,8 +2,6 @@ package com.groupHi.groupHi.domain.room.repository
 
 import com.groupHi.groupHi.domain.room.entity.Room
 import com.groupHi.groupHi.domain.room.entity.RoomStatus
-import com.groupHi.groupHi.global.exception.error.MessageError
-import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
@@ -36,7 +34,7 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         if (!existsById(id)) {
             return null
         }
-        
+
         val room = redisTemplate.opsForHash<String, Any>().entries(id)
         return Room(
             id = id,
@@ -69,10 +67,7 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         redisTemplate.delete("$id:avatarRegistry")
     }
 
-    fun changeGame(id: String, name: String, gameId: String) {
-        if (!isHost(id, name)) {
-            throw MessageException(MessageError.ONLY_HOST_CAN_CHANGE_GAME)
-        }
+    fun updateGame(id: String, gameId: String) {
         redisTemplate.opsForHash<String, String>().put(id, "gameId", gameId)
     }
 

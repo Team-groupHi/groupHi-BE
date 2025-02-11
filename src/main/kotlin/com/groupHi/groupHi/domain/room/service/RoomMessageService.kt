@@ -64,9 +64,21 @@ class RoomMessageService(
     }
 
     fun changeGame(roomId: String, name: String, gameId: String): GameGetResponse {
+        val room = roomRepository.findById(roomId)
+            ?: throw MessageException(MessageError.ROOM_NOT_FOUND)
+
+        if (!room.hostName.equals(name)) {
+            throw MessageException(MessageError.ONLY_HOST_CAN_CHANGE_GAME)
+        }
+        if (room.status == RoomStatus.PLAYING) {
+            throw MessageException(MessageError.ALREADY_PLAYING)
+        }
+
         val game = gameRepository.findById(gameId)
             .orElseThrow { MessageException(MessageError.GAME_NOT_FOUND) }
-        roomRepository.changeGame(roomId, name, game.id)
+
+        roomRepository.updateGame(roomId, gameId)
+
         return GameGetResponse.from(game)
     }
 
