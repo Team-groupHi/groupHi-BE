@@ -25,7 +25,7 @@ class RoomApiController(private val roomService: RoomService) {
         return roomService.getRoom(roomId)
     }
 
-    //TODO: 삭제 예정
+    //TODO: 삭제
     @Operation(summary = "닉네임 중복 체크", deprecated = true)
     @PostMapping("/rooms/{roomId}")
     fun validateName(@PathVariable roomId: String, @RequestBody request: RoomPlayerNameValidateRequest): Boolean {
