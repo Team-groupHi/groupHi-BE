@@ -14,7 +14,11 @@ class BalanceGameRepository(
 
     fun init(roomId: String, theme: BalanceGameTheme, totalRounds: Int) {
         redisTemplate.opsForValue().set("bg:$roomId:rounds", "0/$totalRounds")
-        val contents = balanceGameContentRepository.findByTheme(theme).shuffled().take(totalRounds)
+        val contents = if (theme == BalanceGameTheme.ALL || theme == BalanceGameTheme.GENERAL) {
+            balanceGameContentRepository.findAll().shuffled().take(totalRounds)
+        } else {
+            balanceGameContentRepository.findByTheme(theme).shuffled().take(totalRounds)
+        }
         val players = redisTemplate.opsForHash<String, Boolean>().entries("$roomId:players").keys
         contents.forEachIndexed { idx, content ->
             redisTemplate.opsForHash<String, String>().put("bg:$roomId:contents", "q:${idx + 1}", content.q)
