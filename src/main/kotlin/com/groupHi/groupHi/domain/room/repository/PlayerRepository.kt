@@ -32,7 +32,9 @@ class PlayerRepository(private val redisTemplate: RedisTemplate<String, Any>) {
 
     fun save(roomId: String, player: Player): Player {
         redisTemplate.opsForHash<String, Boolean>().put("$roomId:players", player.name, player.isReady)
-        redisTemplate.opsForHash<String, String>().put("$roomId:avatarRegistry", player.name, player.avatar)
+
+        val avatar = redisTemplate.opsForSet().pop("$roomId:avatarPool") as String
+        redisTemplate.opsForHash<String, String>().put("$roomId:avatarRegistry", player.name, avatar)
 
         if (player.isHost) {
             redisTemplate.opsForHash<String, String>().put(roomId, "hostName", player.name)
@@ -58,5 +60,14 @@ class PlayerRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         redisTemplate.opsForHash<String, String>().put("$roomId:avatarRegistry", newName, avatar!!)
         redisTemplate.opsForHash<String, Boolean>().delete("$roomId:players", name)
         redisTemplate.opsForHash<String, Boolean>().put("$roomId:players", newName, false)
+    }
+
+    fun resetReady(roomId: String) {
+        val hostName = redisTemplate.opsForHash<String, String>().get(roomId, "hostName")
+        redisTemplate.opsForHash<String, Boolean>().entries("$roomId:players")
+            .filter { (name, _) -> name != hostName }
+            .forEach { (name, _) ->
+                redisTemplate.opsForHash<String, Boolean>().put("$roomId:players", name, false)
+            }
     }
 }

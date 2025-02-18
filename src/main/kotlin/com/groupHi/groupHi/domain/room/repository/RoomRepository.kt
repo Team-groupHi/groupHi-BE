@@ -53,10 +53,6 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
             }
     }
 
-    fun takeAvatar(id: String): String {
-        return redisTemplate.opsForSet().pop("$id:avatarPool") as String
-    }
-
     fun delete(id: String) {
         redisTemplate.delete(id)
         redisTemplate.delete("$id:players")
