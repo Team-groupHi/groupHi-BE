@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
 @Service
-class BalanceGameRepository(
+class BalanceGameRepository( //TODO: DataHandler?
     private val redisTemplate: RedisTemplate<String, Any>,
     private val balanceGameContentRepository: BalanceGameContentRepository
 ) { //TODO: 키값 상수화, 서비스 로직과 책임 명확히 나누어 가지도록 리팩터링하기
