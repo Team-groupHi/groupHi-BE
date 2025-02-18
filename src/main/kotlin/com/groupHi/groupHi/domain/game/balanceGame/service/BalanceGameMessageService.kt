@@ -23,6 +23,7 @@ class BalanceGameMessageService(
 
     fun start(roomId: String, name: String, theme: BalanceGameTheme, totalRounds: Int): BalanceGameRoundResponse {
         val room = roomService.getRoom(roomId)
+
         if (room.hostName != name) {
             throw MessageException(MessageError.ONLY_HOST_CAN_START)
         }
@@ -38,6 +39,7 @@ class BalanceGameMessageService(
         if (room.status == RoomStatus.PLAYING) {
             throw MessageException(MessageError.ALREADY_PLAYING)
         }
+
         roomRepository.updateRoomStatus(roomId, RoomStatus.PLAYING)
 
         balanceGameRepository.init(roomId, theme, totalRounds)

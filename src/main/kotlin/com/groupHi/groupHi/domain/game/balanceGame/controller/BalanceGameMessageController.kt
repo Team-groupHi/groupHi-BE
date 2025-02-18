@@ -23,13 +23,13 @@ class BalanceGameMessageController( //TODO: refactor
         headerAccessor: SimpMessageHeaderAccessor,
         @Payload request: BalanceGameStartRequest
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_START,
-                content = balanceGameMessageService.start(roomId!!, name, request.theme, request.totalRounds)
+                content = balanceGameMessageService.start(roomId, name, request.theme, request.totalRounds)
             )
         )
     }
