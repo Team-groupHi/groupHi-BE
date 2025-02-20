@@ -14,10 +14,6 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         return redisTemplate.hasKey(id)
     }
 
-    fun isRoomPlaying(id: String): Boolean {
-        return redisTemplate.opsForHash<String, RoomStatus>().get(id, "status") == RoomStatus.PLAYING
-    }
-
     fun save(room: Room): Room {
         redisTemplate.opsForHash<String, RoomStatus>().put(room.id, "status", room.status)
         redisTemplate.opsForHash<String, String>().put(room.id, "gameId", room.gameId)
@@ -55,10 +51,6 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
             .forEach { (name, _) ->
                 redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, false)
             }
-    }
-
-    fun takeAvatar(id: String): String {
-        return redisTemplate.opsForSet().pop("$id:avatarPool") as String
     }
 
     fun delete(id: String) {

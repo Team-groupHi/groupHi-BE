@@ -13,7 +13,7 @@ data class PlayerResponse(
         fun from(player: Player): PlayerResponse {
             return PlayerResponse(
                 name = player.name,
-                avatar = player.avatar,
+                avatar = player.avatar!!,
                 isHost = player.isHost,
                 isReady = player.isReady
             )

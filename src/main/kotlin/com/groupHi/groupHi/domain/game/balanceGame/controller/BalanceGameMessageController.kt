@@ -23,13 +23,13 @@ class BalanceGameMessageController( //TODO: refactor
         headerAccessor: SimpMessageHeaderAccessor,
         @Payload request: BalanceGameStartRequest
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_START,
-                content = balanceGameMessageService.start(roomId!!, name, request.theme, request.totalRounds)
+                content = balanceGameMessageService.start(roomId, name, request.theme, request.totalRounds)
             )
         )
     }
@@ -39,9 +39,9 @@ class BalanceGameMessageController( //TODO: refactor
         headerAccessor: SimpMessageHeaderAccessor,
         @Payload request: BalanceGameSelectRequest
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        balanceGameMessageService.select(roomId!!, name, request.currentRound, BalanceGameSelection.A)
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
+        balanceGameMessageService.select(roomId, name, request.currentRound, BalanceGameSelection.A)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
@@ -56,9 +56,9 @@ class BalanceGameMessageController( //TODO: refactor
         headerAccessor: SimpMessageHeaderAccessor,
         @Payload request: BalanceGameSelectRequest
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        balanceGameMessageService.select(roomId!!, name, request.currentRound, BalanceGameSelection.B)
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
+        balanceGameMessageService.select(roomId, name, request.currentRound, BalanceGameSelection.B)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
@@ -73,9 +73,9 @@ class BalanceGameMessageController( //TODO: refactor
         headerAccessor: SimpMessageHeaderAccessor,
         @Payload request: BalanceGameSelectRequest
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        balanceGameMessageService.unselect(roomId!!, name, request.currentRound)
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
+        balanceGameMessageService.unselect(roomId, name, request.currentRound)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(
@@ -109,9 +109,9 @@ class BalanceGameMessageController( //TODO: refactor
 
     @MessageMapping("/games/balance-game/end")
     fun end(headerAccessor: SimpMessageHeaderAccessor) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val name = headerAccessor.sessionAttributes?.get("name") as? String ?: "Unknown"
-        balanceGameMessageService.end(roomId!!, name)
+        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
+        val name = headerAccessor.sessionAttributes?.get("name") as String
+        balanceGameMessageService.end(roomId, name)
         messagingTemplate.convertAndSend(
             "/sub/rooms/$roomId",
             MessageResponse(MessageType.BG_END)

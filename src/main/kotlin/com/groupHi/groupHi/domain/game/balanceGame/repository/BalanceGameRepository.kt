@@ -7,30 +7,34 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
 @Service
-class BalanceGameRepository(
+class BalanceGameRepository( //TODO: DataHandler?
     private val redisTemplate: RedisTemplate<String, Any>,
     private val balanceGameContentRepository: BalanceGameContentRepository
 ) { //TODO: 키값 상수화, 서비스 로직과 책임 명확히 나누어 가지도록 리팩터링하기
 
     fun init(roomId: String, theme: BalanceGameTheme, totalRounds: Int) {
+        // 라운드 세팅
         redisTemplate.opsForValue().set("bg:$roomId:rounds", "0/$totalRounds")
-        val contents = if (theme == BalanceGameTheme.ALL || theme == BalanceGameTheme.GENERAL) {
+        // 컨텐츠 세팅
+        val contents = if (theme == BalanceGameTheme.ALL) {
             balanceGameContentRepository.findAll().shuffled().take(totalRounds)
         } else {
             balanceGameContentRepository.findByTheme(theme).shuffled().take(totalRounds)
         }
-        val players = redisTemplate.opsForHash<String, Boolean>().entries("$roomId:players").keys
         contents.forEachIndexed { idx, content ->
             redisTemplate.opsForHash<String, String>().put("bg:$roomId:contents", "q:${idx + 1}", content.q)
             redisTemplate.opsForHash<String, String>().put("bg:$roomId:contents", "a:${idx + 1}", content.a)
             redisTemplate.opsForHash<String, String>().put("bg:$roomId:contents", "b:${idx + 1}", content.b)
         }
+        // 선택 세팅
+        val players = redisTemplate.opsForHash<String, Boolean>().entries("$roomId:players").keys
         players.forEach { name ->
             (1..totalRounds).forEach { round ->
                 redisTemplate.opsForHash<String, BalanceGameSelection>()
                     .put("bg:$roomId:selections", "$name:$round", BalanceGameSelection.C)
             }
         }
+        // 만료 세팅
         redisTemplate.expire("bg:$roomId:rounds", 1, TimeUnit.HOURS)
         redisTemplate.expire("bg:$roomId:contents", 1, TimeUnit.HOURS)
         redisTemplate.expire("bg:$roomId:selections", 1, TimeUnit.HOURS)
@@ -47,7 +51,7 @@ class BalanceGameRepository(
 
     fun increaseRound(roomId: String) {
         val rounds = getRounds(roomId)
-        if (rounds.currentRound < rounds.totalRounds) { //TODO: 분기문 분리
+        if (rounds.currentRound < rounds.totalRounds) {
             redisTemplate.opsForValue().set("bg:$roomId:rounds", "${rounds.currentRound + 1}/${rounds.totalRounds}")
         }
     }

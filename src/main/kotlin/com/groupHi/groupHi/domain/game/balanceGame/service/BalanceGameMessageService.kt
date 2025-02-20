@@ -23,6 +23,7 @@ class BalanceGameMessageService(
 
     fun start(roomId: String, name: String, theme: BalanceGameTheme, totalRounds: Int): BalanceGameRoundResponse {
         val room = roomService.getRoom(roomId)
+
         if (room.hostName != name) {
             throw MessageException(MessageError.ONLY_HOST_CAN_START)
         }
@@ -38,6 +39,7 @@ class BalanceGameMessageService(
         if (room.status == RoomStatus.PLAYING) {
             throw MessageException(MessageError.ALREADY_PLAYING)
         }
+
         roomRepository.updateRoomStatus(roomId, RoomStatus.PLAYING)
 
         balanceGameRepository.init(roomId, theme, totalRounds)
@@ -74,8 +76,8 @@ class BalanceGameMessageService(
             throw MessageException(MessageError.ONLY_HOST_CAN_NEXT)
         }
 
-        //TODO: 리팩터링 시 마지막 라운드 요청에 대한 방지 처리 필요
         balanceGameRepository.increaseRound(roomId)
+
         val rounds = balanceGameRepository.getRounds(roomId)
         val content = balanceGameRepository.getContents(roomId)[rounds.currentRound - 1]
         return BalanceGameRoundResponse(
@@ -94,6 +96,7 @@ class BalanceGameMessageService(
         if (room.hostName != name) {
             throw MessageException(MessageError.ONLY_HOST_CAN_END)
         }
+
         roomRepository.resetPlayerReady(roomId)
         roomRepository.updateRoomStatus(roomId, RoomStatus.WAITING)
         balanceGameRepository.clean(roomId)
@@ -102,7 +105,6 @@ class BalanceGameMessageService(
     fun getBalanceGameResults(roomId: String, round: Int?): List<BalanceGameResultGetResponse> {
         val contents = balanceGameRepository.getContents(roomId)
         val selections = balanceGameRepository.getSelections(roomId)
-
         return contents
             .filter { round == null || it.round == round }
             .map { content ->

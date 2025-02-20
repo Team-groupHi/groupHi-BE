@@ -35,13 +35,12 @@ class RoomMessageService(
             room.id,
             Player(
                 name = name,
-                avatar = roomRepository.takeAvatar(room.id),
                 isHost = room.hostName == null,
                 isReady = room.hostName == null
             )
         )
 
-        return player.avatar
+        return player.avatar!!
     }
 
     fun exitRoom(roomId: String, name: String) {
