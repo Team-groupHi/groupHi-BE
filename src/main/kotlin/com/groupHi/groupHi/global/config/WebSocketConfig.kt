@@ -11,17 +11,19 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
-class WebSocketConfig(@Value("\${allowed-origins}") private val allowedOrigins: String) : WebSocketMessageBrokerConfigurer {
+class WebSocketConfig(@Value("\${allowed-origins}") private val allowedOrigins: String) :
+    WebSocketMessageBrokerConfigurer {
 
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
         registry.addEndpoint("/ws").setAllowedOrigins(allowedOrigins)
     }
 
     override fun configureMessageBroker(registry: MessageBrokerRegistry) {
-        registry.enableSimpleBroker("/sub")
+        registry.enableSimpleBroker("/sub", "/topic", "/queue") //TODO: sub 삭제
             .setHeartbeatValue(longArrayOf(10000, 10000))
             .setTaskScheduler(taskScheduler())
-        registry.setApplicationDestinationPrefixes("/pub")
+        registry.setApplicationDestinationPrefixes("/pub", "/app") //TODO: pub 삭제
+        registry.setUserDestinationPrefix("/user")
     }
 
     @Bean
