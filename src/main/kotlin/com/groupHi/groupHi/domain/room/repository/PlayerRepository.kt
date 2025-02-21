@@ -34,6 +34,7 @@ class PlayerRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         redisTemplate.opsForHash<String, Boolean>().put("$roomId:players", player.name, player.isReady)
 
         val avatar = redisTemplate.opsForSet().pop("$roomId:avatarPool") as String
+        player.avatar = avatar
         redisTemplate.opsForHash<String, String>().put("$roomId:avatarRegistry", player.name, avatar)
 
         if (player.isHost) {
