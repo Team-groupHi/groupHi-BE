@@ -19,10 +19,10 @@ class WebSocketConfig(@Value("\${allowed-origins}") private val allowedOrigins: 
     }
 
     override fun configureMessageBroker(registry: MessageBrokerRegistry) {
-        registry.enableSimpleBroker("/sub", "topic", "queue") //TODO: sub 삭제
+        registry.enableSimpleBroker("/sub", "/topic", "/queue") //TODO: sub 삭제
             .setHeartbeatValue(longArrayOf(10000, 10000))
             .setTaskScheduler(taskScheduler())
-        registry.setApplicationDestinationPrefixes("/pub", "app") //TODO: pub 삭제
+        registry.setApplicationDestinationPrefixes("/pub", "/app") //TODO: pub 삭제
         registry.setUserDestinationPrefix("/user")
     }
 
