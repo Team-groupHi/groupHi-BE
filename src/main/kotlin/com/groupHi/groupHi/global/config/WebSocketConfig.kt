@@ -23,6 +23,7 @@ class WebSocketConfig(@Value("\${allowed-origins}") private val allowedOrigins: 
             .setHeartbeatValue(longArrayOf(10000, 10000))
             .setTaskScheduler(taskScheduler())
         registry.setApplicationDestinationPrefixes("/pub", "app") //TODO: pub 삭제
+        registry.setUserDestinationPrefix("/user")
     }
 
     @Bean
