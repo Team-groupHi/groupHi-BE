@@ -96,6 +96,7 @@ class RoomMessageService(
 
         if (room.hostName == name) {
             roomRepository.updateHostName(roomId, newName)
+            playerRepository.updateReady(roomId, newName, true)
         }
     }
 }
