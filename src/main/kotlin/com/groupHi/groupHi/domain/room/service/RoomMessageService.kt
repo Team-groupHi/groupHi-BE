@@ -88,6 +88,9 @@ class RoomMessageService(
         if (room.status == RoomStatus.PLAYING) {
             throw MessageException(MessageError.NAME_CHANGE_NOT_ALLOWED)
         }
+        if (playerRepository.findByRoomIdAndName(roomId, name)?.isReady == true) {
+            throw MessageException(MessageError.NAME_CHANGE_NOT_ALLOWED)
+        }
         if (playerRepository.existsByRoomIdAndName(room.id, newName)) {
             throw MessageException(MessageError.INVALID_NAME)
         }

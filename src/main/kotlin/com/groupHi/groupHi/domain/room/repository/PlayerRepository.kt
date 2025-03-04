@@ -16,6 +16,17 @@ class PlayerRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         return redisTemplate.opsForHash<String, Boolean>().size("$roomId:players")
     }
 
+    fun findByRoomIdAndName(roomId: String, name: String): Player? {
+        val avatar = redisTemplate.opsForHash<String, String>().get("$roomId:avatarRegistry", name)
+        val isReady = redisTemplate.opsForHash<String, Boolean>().get("$roomId:players", name)
+        return Player(
+            name = name,
+            avatar = avatar!!,
+            isHost = name == redisTemplate.opsForHash<String, String>().get(roomId, "hostName"),
+            isReady = isReady!!
+        )
+    }
+
     fun findAllByRoomId(roomId: String): List<Player> {
         val hostName = redisTemplate.opsForHash<String, String>().get(roomId, "hostName")
         val players = redisTemplate.opsForHash<String, Boolean>().entries("$roomId:players")
