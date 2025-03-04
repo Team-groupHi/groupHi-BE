@@ -1,7 +1,7 @@
 package com.groupHi.groupHi.global.dto.response
 
 import com.groupHi.groupHi.global.dto.MessageType
-import com.groupHi.groupHi.global.exception.error.MessageError
+import com.groupHi.groupHi.global.exception.error.ErrorCode
 
 data class MessageResponse(
     val type: MessageType,
@@ -10,10 +10,10 @@ data class MessageResponse(
 ) {
 
     companion object {
-        fun error(error: MessageError): MessageResponse {
+        fun error(e: ErrorCode): MessageResponse {
             return MessageResponse(
                 type = MessageType.ERROR,
-                content = MessageErrorResponse.from(error)
+                content = ErrorResponse.from(e)
             )
         }
     }
