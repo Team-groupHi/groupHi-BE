@@ -6,7 +6,7 @@ import com.groupHi.groupHi.domain.room.entity.Player
 import com.groupHi.groupHi.domain.room.entity.RoomStatus
 import com.groupHi.groupHi.domain.room.repository.PlayerRepository
 import com.groupHi.groupHi.domain.room.repository.RoomRepository
-import com.groupHi.groupHi.global.exception.error.MessageError
+import com.groupHi.groupHi.global.exception.error.ErrorCode
 import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.stereotype.Service
 
@@ -19,16 +19,16 @@ class RoomMessageService(
 
     fun enterRoom(roomId: String, name: String): String {
         val room = roomRepository.findById(roomId)
-            ?: throw MessageException(MessageError.ROOM_NOT_FOUND)
+            ?: throw MessageException(ErrorCode.ROOM_NOT_FOUND)
 
         if (room.status == RoomStatus.PLAYING) {
-            throw MessageException(MessageError.ALREADY_PLAYING)
+            throw MessageException(ErrorCode.ALREADY_PLAYING)
         }
         if (name == "System" || playerRepository.existsByRoomIdAndName(room.id, name)) {
-            throw MessageException(MessageError.INVALID_NAME)
+            throw MessageException(ErrorCode.INVALID_NAME)
         }
         if (playerRepository.countByRoomId(room.id) >= 8) {
-            throw MessageException(MessageError.ROOM_FULL)
+            throw MessageException(ErrorCode.ROOM_FULL)
         }
 
         val player = playerRepository.save(
@@ -64,17 +64,17 @@ class RoomMessageService(
 
     fun changeGame(roomId: String, name: String, gameId: String): GameGetResponse {
         val room = roomRepository.findById(roomId)
-            ?: throw MessageException(MessageError.ROOM_NOT_FOUND)
+            ?: throw MessageException(ErrorCode.ROOM_NOT_FOUND)
 
         if (!room.hostName.equals(name)) {
-            throw MessageException(MessageError.ONLY_HOST_CAN_CHANGE_GAME)
+            throw MessageException(ErrorCode.ONLY_HOST_CAN_CHANGE_GAME)
         }
         if (room.status == RoomStatus.PLAYING) {
-            throw MessageException(MessageError.ALREADY_PLAYING)
+            throw MessageException(ErrorCode.ALREADY_PLAYING)
         }
 
         val game = gameRepository.findById(gameId)
-            .orElseThrow { MessageException(MessageError.GAME_NOT_FOUND) }
+            .orElseThrow { MessageException(ErrorCode.GAME_NOT_FOUND) }
 
         roomRepository.updateGame(roomId, gameId)
 
@@ -83,16 +83,16 @@ class RoomMessageService(
 
     fun changePlayerName(roomId: String, name: String, newName: String) {
         val room = roomRepository.findById(roomId)
-            ?: throw MessageException(MessageError.ROOM_NOT_FOUND)
+            ?: throw MessageException(ErrorCode.ROOM_NOT_FOUND)
 
         if (room.status == RoomStatus.PLAYING) {
-            throw MessageException(MessageError.NAME_CHANGE_NOT_ALLOWED)
+            throw MessageException(ErrorCode.NAME_CHANGE_NOT_ALLOWED)
         }
         if (playerRepository.findByRoomIdAndName(roomId, name)?.isReady == true) {
-            throw MessageException(MessageError.NAME_CHANGE_NOT_ALLOWED)
+            throw MessageException(ErrorCode.NAME_CHANGE_NOT_ALLOWED)
         }
         if (playerRepository.existsByRoomIdAndName(room.id, newName)) {
-            throw MessageException(MessageError.INVALID_NAME)
+            throw MessageException(ErrorCode.INVALID_NAME)
         }
 
         playerRepository.updateName(roomId, name, newName)

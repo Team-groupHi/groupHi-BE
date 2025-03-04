@@ -1,9 +1,9 @@
 package com.groupHi.groupHi.global.exception.handler
 
 import com.groupHi.groupHi.global.dto.MessageType
-import com.groupHi.groupHi.global.dto.response.MessageErrorResponse
+import com.groupHi.groupHi.global.dto.response.ErrorResponse
 import com.groupHi.groupHi.global.dto.response.MessageResponse
-import com.groupHi.groupHi.global.exception.error.MessageError
+import com.groupHi.groupHi.global.exception.error.ErrorCode
 import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor
@@ -39,7 +39,7 @@ class MessageExceptionHandler(private val messagingTemplate: SimpMessageSendingO
             MessageResponse(
                 type = MessageType.ERROR,
                 sender = "System",
-                content = MessageErrorResponse.from(MessageError.INTERNAL_SERVER_ERROR)
+                content = ErrorResponse.from(ErrorCode.INTERNAL_SERVER_ERROR)
             )
         )
     }

@@ -9,7 +9,7 @@ import com.groupHi.groupHi.domain.room.entity.Room
 import com.groupHi.groupHi.domain.room.entity.RoomStatus
 import com.groupHi.groupHi.domain.room.repository.PlayerRepository
 import com.groupHi.groupHi.domain.room.repository.RoomRepository
-import com.groupHi.groupHi.global.exception.error.ApiError
+import com.groupHi.groupHi.global.exception.error.ErrorCode
 import com.groupHi.groupHi.global.exception.exception.ApiException
 import org.springframework.stereotype.Service
 
@@ -22,7 +22,7 @@ class RoomService(
 
     fun createRoom(request: RoomCreateRequest): String {
         val game = gameRepository.findById(request.gameId)
-            .orElseThrow { ApiException(ApiError.GAME_NOT_FOUND) }
+            .orElseThrow { ApiException(ErrorCode.GAME_NOT_FOUND) }
 
         val room = roomRepository.save(
             Room(
@@ -37,9 +37,9 @@ class RoomService(
 
     fun getRoom(roomId: String): RoomResponse {
         val room = roomRepository.findById(roomId)
-            ?: throw ApiException(ApiError.ROOM_NOT_FOUND)
+            ?: throw ApiException(ErrorCode.ROOM_NOT_FOUND)
         val game = gameRepository.findById(room.gameId)
-            .orElseThrow { ApiException(ApiError.GAME_NOT_FOUND) }
+            .orElseThrow { ApiException(ErrorCode.GAME_NOT_FOUND) }
         val players = playerRepository.findAllByRoomId(roomId)
 
         return RoomResponse(

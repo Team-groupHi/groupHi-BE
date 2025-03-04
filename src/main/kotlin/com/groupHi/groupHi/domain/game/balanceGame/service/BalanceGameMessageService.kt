@@ -10,7 +10,7 @@ import com.groupHi.groupHi.domain.room.entity.RoomStatus
 import com.groupHi.groupHi.domain.room.repository.PlayerRepository
 import com.groupHi.groupHi.domain.room.repository.RoomRepository
 import com.groupHi.groupHi.domain.room.service.RoomService
-import com.groupHi.groupHi.global.exception.error.MessageError
+import com.groupHi.groupHi.global.exception.error.ErrorCode
 import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -27,19 +27,19 @@ class BalanceGameMessageService(
         val room = roomService.getRoom(roomId)
 
         if (room.hostName != name) {
-            throw MessageException(MessageError.ONLY_HOST_CAN_START)
+            throw MessageException(ErrorCode.ONLY_HOST_CAN_START)
         }
         if (room.players.size < 2) {
-            throw MessageException(MessageError.NOT_ENOUGH_PLAYERS)
+            throw MessageException(ErrorCode.NOT_ENOUGH_PLAYERS)
         }
         if (room.players.any { !it.isReady }) {
-            throw MessageException(MessageError.NOT_ALL_PLAYERS_READY)
+            throw MessageException(ErrorCode.NOT_ALL_PLAYERS_READY)
         }
         if (totalRounds < 1 || totalRounds > 20) {
-            throw MessageException(MessageError.INVALID_ROUND_COUNT)
+            throw MessageException(ErrorCode.INVALID_ROUND_COUNT)
         }
         if (room.status == RoomStatus.PLAYING) {
-            throw MessageException(MessageError.ALREADY_PLAYING)
+            throw MessageException(ErrorCode.ALREADY_PLAYING)
         }
 
         roomRepository.updateRoomStatus(roomId, RoomStatus.PLAYING)
@@ -75,7 +75,7 @@ class BalanceGameMessageService(
     fun next(roomId: String, name: String): BalanceGameRoundResponse {
         val room = roomService.getRoom(roomId)
         if (room.hostName != name) {
-            throw MessageException(MessageError.ONLY_HOST_CAN_NEXT)
+            throw MessageException(ErrorCode.ONLY_HOST_CAN_NEXT)
         }
 
         balanceGameRepository.increaseRound(roomId)
@@ -96,7 +96,7 @@ class BalanceGameMessageService(
     fun end(roomId: String, name: String) {
         val room = roomService.getRoom(roomId)
         if (room.hostName != name) {
-            throw MessageException(MessageError.ONLY_HOST_CAN_END)
+            throw MessageException(ErrorCode.ONLY_HOST_CAN_END)
         }
 
         playerRepository.resetReady(roomId)

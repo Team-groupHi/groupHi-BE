@@ -1,9 +1,11 @@
 package com.groupHi.groupHi.global.exception.exception
 
-import com.groupHi.groupHi.global.dto.response.ApiErrorResponse
-import com.groupHi.groupHi.global.exception.error.ApiError
+import com.groupHi.groupHi.global.dto.response.ErrorResponse
+import com.groupHi.groupHi.global.exception.error.ErrorCode
 
-class ApiException(private val e: ApiError) : RuntimeException(e.message) {
+class ApiException(private val e: ErrorCode) : RuntimeException(e.message), BaseException {
     val statusCode: Int get() = e.statusCode.value()
-    val response: ApiErrorResponse get() = ApiErrorResponse.from(e)
+    override val code: String get() = e.code
+    override val message: String get() = e.message
+    override val response: ErrorResponse get() = ErrorResponse.from(e)
 }
