@@ -44,15 +44,6 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         redisTemplate.opsForHash<String, RoomStatus>().put(id, "status", status)
     }
 
-    // 방장을 제외한 모든 플레이어 준비상태 false로
-    fun resetPlayerReady(id: String) {
-        redisTemplate.opsForHash<String, Boolean>().entries("$id:players")
-            .filter { (name, _) -> !isHost(id, name) }
-            .forEach { (name, _) ->
-                redisTemplate.opsForHash<String, Boolean>().put("$id:players", name, false)
-            }
-    }
-
     fun delete(id: String) {
         redisTemplate.delete(id)
         redisTemplate.delete("$id:players")

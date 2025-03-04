@@ -7,6 +7,7 @@ import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameRound
 import com.groupHi.groupHi.domain.game.balanceGame.dto.response.BalanceGameSelectionsResponse
 import com.groupHi.groupHi.domain.game.balanceGame.repository.BalanceGameRepository
 import com.groupHi.groupHi.domain.room.entity.RoomStatus
+import com.groupHi.groupHi.domain.room.repository.PlayerRepository
 import com.groupHi.groupHi.domain.room.repository.RoomRepository
 import com.groupHi.groupHi.domain.room.service.RoomService
 import com.groupHi.groupHi.global.exception.error.MessageError
@@ -18,6 +19,7 @@ import java.time.LocalDateTime
 class BalanceGameMessageService(
     private val roomService: RoomService,
     private val roomRepository: RoomRepository,
+    private val playerRepository: PlayerRepository,
     private val balanceGameRepository: BalanceGameRepository
 ) {
 
@@ -97,7 +99,7 @@ class BalanceGameMessageService(
             throw MessageException(MessageError.ONLY_HOST_CAN_END)
         }
 
-        roomRepository.resetPlayerReady(roomId)
+        playerRepository.resetReady(roomId)
         roomRepository.updateRoomStatus(roomId, RoomStatus.WAITING)
         balanceGameRepository.clean(roomId)
     }
