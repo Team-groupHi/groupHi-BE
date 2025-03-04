@@ -1,5 +1,6 @@
 package com.groupHi.groupHi.global.config
 
+import com.groupHi.groupHi.global.handler.StompHandshakeHandler
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,7 +16,9 @@ class WebSocketConfig(@Value("\${allowed-origins}") private val allowedOrigins: 
     WebSocketMessageBrokerConfigurer {
 
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
-        registry.addEndpoint("/ws").setAllowedOrigins(allowedOrigins)
+        registry.addEndpoint("/ws")
+            .setAllowedOrigins(allowedOrigins)
+            .setHandshakeHandler(StompHandshakeHandler())
     }
 
     override fun configureMessageBroker(registry: MessageBrokerRegistry) {

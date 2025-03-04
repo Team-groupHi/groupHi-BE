@@ -15,9 +15,11 @@ class MessageExceptionHandler(private val messagingTemplate: SimpMessageSendingO
 
     @MessageExceptionHandler
     fun handleMessageException(e: MessageException, headerAccessor: SimpMessageHeaderAccessor) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String //TODO: refactor
-        return messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+        print("🚨 $e")
+        val userId = headerAccessor.user?.name ?: return
+        messagingTemplate.convertAndSendToUser(
+            userId,
+            "/queue/errors",
             MessageResponse(
                 type = MessageType.ERROR,
                 sender = "System",
@@ -30,14 +32,14 @@ class MessageExceptionHandler(private val messagingTemplate: SimpMessageSendingO
     fun handleException(e: Exception, headerAccessor: SimpMessageHeaderAccessor) {
         print("🚨 $e")
         e.printStackTrace()
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as? String
-        val e = MessageError.INTERNAL_SERVER_ERROR
-        return messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+        val userId = headerAccessor.user?.name ?: return
+        return messagingTemplate.convertAndSendToUser(
+            userId,
+            "/queue/errors",
             MessageResponse(
                 type = MessageType.ERROR,
                 sender = "System",
-                content = MessageErrorResponse.from(e)
+                content = MessageErrorResponse.from(MessageError.INTERNAL_SERVER_ERROR)
             )
         )
     }
