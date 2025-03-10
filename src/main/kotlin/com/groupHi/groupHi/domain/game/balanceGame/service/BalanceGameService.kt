@@ -14,10 +14,9 @@ import com.groupHi.groupHi.global.exception.error.ErrorCode
 import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.stereotype.Service
 import java.time.Instant
-import java.time.LocalDateTime
 
 @Service
-class BalanceGameMessageService(
+class BalanceGameService(
     private val roomService: RoomService,
     private val roomRepository: RoomRepository,
     private val playerRepository: PlayerRepository,
