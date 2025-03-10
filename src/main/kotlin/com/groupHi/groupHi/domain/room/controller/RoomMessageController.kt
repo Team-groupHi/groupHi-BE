@@ -31,7 +31,7 @@ class RoomMessageController( //TODO: refactor
         headerAccessor.sessionAttributes?.set("roomId", request.roomId)
         headerAccessor.sessionAttributes?.set("name", request.name)
         messagingTemplate.convertAndSend(
-            "/sub/rooms/${request.roomId}",
+            "/topic/rooms/${request.roomId}",
             MessageResponse(
                 type = MessageType.ENTER,
                 sender = request.name,
@@ -46,7 +46,7 @@ class RoomMessageController( //TODO: refactor
         val name = headerAccessor.sessionAttributes?.get("name") as String
         roomMessageService.exitRoom(roomId, name)
         messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+            "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.EXIT,
                 sender = name
@@ -62,7 +62,7 @@ class RoomMessageController( //TODO: refactor
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
         val name = headerAccessor.sessionAttributes?.get("name") as String
         messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+            "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.CHAT,
                 sender = name,
@@ -77,7 +77,7 @@ class RoomMessageController( //TODO: refactor
         val name = headerAccessor.sessionAttributes?.get("name") as String
         roomMessageService.ready(roomId, name)
         messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+            "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.READY,
                 sender = name
@@ -91,7 +91,7 @@ class RoomMessageController( //TODO: refactor
         val name = headerAccessor.sessionAttributes?.get("name") as String
         roomMessageService.unready(roomId, name)
         messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+            "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.UNREADY,
                 sender = name
@@ -107,7 +107,7 @@ class RoomMessageController( //TODO: refactor
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
         val name = headerAccessor.sessionAttributes?.get("name") as String
         messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+            "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.CHANGE_GAME,
                 content = roomMessageService.changeGame(roomId, name, request.gameId)
@@ -125,7 +125,7 @@ class RoomMessageController( //TODO: refactor
         roomMessageService.changePlayerName(roomId, name, request.name)
         headerAccessor.sessionAttributes?.set("name", request.name)
         messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+            "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.CHANGE_PLAYER_NAME,
                 sender = name,
@@ -141,7 +141,7 @@ class RoomMessageController( //TODO: refactor
         val name = headerAccessor.sessionAttributes?.get("name") as String
         roomMessageService.exitRoom(roomId, name)
         messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+            "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.EXIT,
                 sender = name

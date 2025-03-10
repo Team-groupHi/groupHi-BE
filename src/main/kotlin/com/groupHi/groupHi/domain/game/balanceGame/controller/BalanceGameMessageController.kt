@@ -26,7 +26,7 @@ class BalanceGameMessageController( //TODO: refactor
         val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
         val name = headerAccessor.sessionAttributes?.get("name") as String
         messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+            "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_START,
                 content = balanceGameMessageService.start(roomId, name, request.theme, request.totalRounds)
@@ -43,7 +43,7 @@ class BalanceGameMessageController( //TODO: refactor
         val name = headerAccessor.sessionAttributes?.get("name") as String
         balanceGameMessageService.select(roomId, name, request.currentRound, BalanceGameSelection.A)
         messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+            "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_SELECT,
                 sender = name,
@@ -60,7 +60,7 @@ class BalanceGameMessageController( //TODO: refactor
         val name = headerAccessor.sessionAttributes?.get("name") as String
         balanceGameMessageService.select(roomId, name, request.currentRound, BalanceGameSelection.B)
         messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+            "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_SELECT,
                 sender = name
@@ -77,7 +77,7 @@ class BalanceGameMessageController( //TODO: refactor
         val name = headerAccessor.sessionAttributes?.get("name") as String
         balanceGameMessageService.unselect(roomId, name, request.currentRound)
         messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+            "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_UNSELECT,
                 sender = name
@@ -92,14 +92,14 @@ class BalanceGameMessageController( //TODO: refactor
 
         if (balanceGameMessageService.isFinished(roomId)) {
             messagingTemplate.convertAndSend(
-                "/sub/rooms/$roomId",
+                "/topic/rooms/$roomId",
                 MessageResponse(MessageType.BG_ALL_RESULTS)
             )
             return
         }
 
         messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+            "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_NEXT,
                 content = balanceGameMessageService.next(roomId, name)
@@ -113,7 +113,7 @@ class BalanceGameMessageController( //TODO: refactor
         val name = headerAccessor.sessionAttributes?.get("name") as String
         balanceGameMessageService.end(roomId, name)
         messagingTemplate.convertAndSend(
-            "/sub/rooms/$roomId",
+            "/topic/rooms/$roomId",
             MessageResponse(MessageType.BG_END)
         )
     }
