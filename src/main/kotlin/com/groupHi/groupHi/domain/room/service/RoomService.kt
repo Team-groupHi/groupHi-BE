@@ -5,12 +5,14 @@ import com.groupHi.groupHi.domain.game.repository.GameRepository
 import com.groupHi.groupHi.domain.room.dto.request.RoomCreateRequest
 import com.groupHi.groupHi.domain.room.dto.response.PlayerResponse
 import com.groupHi.groupHi.domain.room.dto.response.RoomResponse
+import com.groupHi.groupHi.domain.room.entity.Player
 import com.groupHi.groupHi.domain.room.entity.Room
 import com.groupHi.groupHi.domain.room.entity.RoomStatus
 import com.groupHi.groupHi.domain.room.repository.PlayerRepository
 import com.groupHi.groupHi.domain.room.repository.RoomRepository
 import com.groupHi.groupHi.global.exception.error.ErrorCode
 import com.groupHi.groupHi.global.exception.exception.ApiException
+import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.stereotype.Service
 
 @Service
@@ -55,6 +57,92 @@ class RoomService(
 
     fun isValidPlayerName(roomId: String, name: String): Boolean {
         return name != "System" && !playerRepository.existsByRoomIdAndName(roomId, name)
+    }
+
+    fun enterRoom(roomId: String, name: String): String {
+        val room = roomRepository.findById(roomId)
+            ?: throw MessageException(ErrorCode.ROOM_NOT_FOUND)
+
+        if (room.status == RoomStatus.PLAYING) {
+            throw MessageException(ErrorCode.ALREADY_PLAYING)
+        }
+        if (name == "System" || playerRepository.existsByRoomIdAndName(room.id, name)) {
+            throw MessageException(ErrorCode.INVALID_NAME)
+        }
+        if (playerRepository.countByRoomId(room.id) >= 8) {
+            throw MessageException(ErrorCode.ROOM_FULL)
+        }
+
+        val player = playerRepository.save(
+            room.id,
+            Player(
+                name = name,
+                isHost = room.hostName == null,
+                isReady = room.hostName == null
+            )
+        )
+
+        return player.avatar!!
+    }
+
+    fun exitRoom(roomId: String, name: String) {
+        val room = roomRepository.findById(roomId)
+        room?.let {
+            if (it.hostName == name) {
+                roomRepository.delete(it.id)
+            } else {
+                playerRepository.delete(it.id, name)
+            }
+        }
+    }
+
+    fun ready(roomId: String, name: String) {
+        playerRepository.updateReady(roomId, name, true)
+    }
+
+    fun unready(roomId: String, name: String) {
+        playerRepository.updateReady(roomId, name, false)
+    }
+
+    fun changeGame(roomId: String, name: String, gameId: String): GameGetResponse {
+        val room = roomRepository.findById(roomId)
+            ?: throw MessageException(ErrorCode.ROOM_NOT_FOUND)
+
+        if (!room.hostName.equals(name)) {
+            throw MessageException(ErrorCode.ONLY_HOST_CAN_CHANGE_GAME)
+        }
+        if (room.status == RoomStatus.PLAYING) {
+            throw MessageException(ErrorCode.ALREADY_PLAYING)
+        }
+
+        val game = gameRepository.findById(gameId)
+            .orElseThrow { MessageException(ErrorCode.GAME_NOT_FOUND) }
+
+        roomRepository.updateGame(roomId, gameId)
+
+        return GameGetResponse.from(game)
+    }
+
+    fun changePlayerName(roomId: String, name: String, newName: String) {
+        val room = roomRepository.findById(roomId)
+            ?: throw MessageException(ErrorCode.ROOM_NOT_FOUND)
+
+        if (room.status == RoomStatus.PLAYING) {
+            throw MessageException(ErrorCode.NAME_CHANGE_NOT_ALLOWED)
+        }
+        if (playerRepository.findByRoomIdAndName(roomId, name)?.isReady == true) {
+            throw MessageException(ErrorCode.NAME_CHANGE_NOT_ALLOWED)
+        }
+        if (playerRepository.existsByRoomIdAndName(room.id, newName)) {
+            throw MessageException(ErrorCode.INVALID_NAME)
+        }
+
+        playerRepository.updateName(roomId, name, newName)
+
+        if (room.hostName == name) {
+            roomRepository.updateHostName(roomId, newName)
+            playerRepository.updateReady(roomId, newName, true)
+        }
     }
 
     private fun generateUniqueRoomId(): String {
