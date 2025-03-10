@@ -13,6 +13,7 @@ import com.groupHi.groupHi.domain.room.service.RoomService
 import com.groupHi.groupHi.global.exception.error.ErrorCode
 import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.stereotype.Service
+import java.time.Instant
 import java.time.LocalDateTime
 
 @Service
@@ -51,8 +52,8 @@ class BalanceGameMessageService(
         return BalanceGameRoundResponse(
             totalRounds = totalRounds,
             currentRound = 1,
-            startTime = LocalDateTime.now(),
-            endTime = LocalDateTime.now().plusSeconds(10), //TODO: 시간 상수화 or 설정값으로 변경
+            startTime = Instant.now(),
+            endTime = Instant.now().plusSeconds(10), //TODO: 시간 상수화 or 설정값으로 변경
             q = content.q,
             a = content.a,
             b = content.b
@@ -85,8 +86,8 @@ class BalanceGameMessageService(
         return BalanceGameRoundResponse(
             totalRounds = rounds.totalRounds,
             currentRound = rounds.currentRound,
-            startTime = LocalDateTime.now(),
-            endTime = LocalDateTime.now().plusSeconds(10), //TODO: 시간 상수화 or 설정값으로 변경
+            startTime = Instant.now(),
+            endTime = Instant.now().plusSeconds(10), //TODO: 시간 상수화 or 설정값으로 변경
             q = content.q,
             a = content.a,
             b = content.b
