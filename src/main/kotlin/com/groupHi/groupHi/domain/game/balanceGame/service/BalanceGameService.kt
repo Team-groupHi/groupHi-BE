@@ -24,26 +24,8 @@ class BalanceGameService(
 ) {
 
     fun start(roomId: String, name: String, theme: BalanceGameTheme, totalRounds: Int): BalanceGameRoundResponse {
-        val room = roomService.getRoom(roomId)
-
-        if (room.hostName != name) {
-            throw MessageException(ErrorCode.ONLY_HOST_CAN_START)
-        }
-        if (room.players.size < 2) {
-            throw MessageException(ErrorCode.NOT_ENOUGH_PLAYERS)
-        }
-        if (room.players.any { !it.isReady }) {
-            throw MessageException(ErrorCode.NOT_ALL_PLAYERS_READY)
-        }
-        if (totalRounds < 1 || totalRounds > 20) {
-            throw MessageException(ErrorCode.INVALID_ROUND_COUNT)
-        }
-        if (room.status == RoomStatus.PLAYING) {
-            throw MessageException(ErrorCode.ALREADY_PLAYING)
-        }
-
+        roomService.validateStartable(roomId, name, totalRounds)
         roomRepository.updateRoomStatus(roomId, RoomStatus.PLAYING)
-
         balanceGameRepository.init(roomId, theme, totalRounds)
         balanceGameRepository.increaseRound(roomId)
 

@@ -55,10 +55,6 @@ class RoomService(
         )
     }
 
-    fun isValidPlayerName(roomId: String, name: String): Boolean {
-        return name != "System" && !playerRepository.existsByRoomIdAndName(roomId, name)
-    }
-
     fun enterRoom(roomId: String, name: String): String {
         val room = roomRepository.findById(roomId)
             ?: throw MessageException(ErrorCode.ROOM_NOT_FOUND)
@@ -123,6 +119,10 @@ class RoomService(
         return GameGetResponse.from(game)
     }
 
+    fun isValidPlayerName(roomId: String, name: String): Boolean {
+        return name != "System" && !playerRepository.existsByRoomIdAndName(roomId, name)
+    }
+
     fun changePlayerName(roomId: String, name: String, newName: String) {
         val room = roomRepository.findById(roomId)
             ?: throw MessageException(ErrorCode.ROOM_NOT_FOUND)
@@ -142,6 +142,26 @@ class RoomService(
         if (room.hostName == name) {
             roomRepository.updateHostName(roomId, newName)
             playerRepository.updateReady(roomId, newName, true)
+        }
+    }
+
+    fun validateStartable(roomId: String, name: String, totalRounds: Int) {
+        val room = getRoom(roomId)
+
+        if (room.hostName != name) {
+            throw MessageException(ErrorCode.ONLY_HOST_CAN_START)
+        }
+        if (room.players.size < 2) {
+            throw MessageException(ErrorCode.NOT_ENOUGH_PLAYERS)
+        }
+        if (room.players.any { !it.isReady }) {
+            throw MessageException(ErrorCode.NOT_ALL_PLAYERS_READY)
+        }
+        if (totalRounds < 1 || totalRounds > 20) {
+            throw MessageException(ErrorCode.INVALID_ROUND_COUNT)
+        }
+        if (room.status == RoomStatus.PLAYING) {
+            throw MessageException(ErrorCode.ALREADY_PLAYING)
         }
     }
 
