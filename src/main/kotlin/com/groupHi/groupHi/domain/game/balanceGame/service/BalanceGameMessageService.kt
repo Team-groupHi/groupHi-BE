@@ -36,7 +36,7 @@ class BalanceGameMessageService(
         if (room.players.any { !it.isReady }) {
             throw MessageException(ErrorCode.NOT_ALL_PLAYERS_READY)
         }
-        if (totalRounds < 1 || totalRounds > 20) {
+        if (totalRounds < 10 || totalRounds > 20) {
             throw MessageException(ErrorCode.INVALID_ROUND_COUNT)
         }
         if (room.status == RoomStatus.PLAYING) {
