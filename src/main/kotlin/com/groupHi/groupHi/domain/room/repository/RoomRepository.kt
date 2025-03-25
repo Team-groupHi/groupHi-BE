@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 
 @Service
 class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
-    //TODO: 키값 상수화, 서비스 로직과 책임 명확히 나누어 가지도록 리팩터링하기
+    //TODO: 키값 상수화
 
     fun existsById(id: String): Boolean {
         return redisTemplate.hasKey(id)

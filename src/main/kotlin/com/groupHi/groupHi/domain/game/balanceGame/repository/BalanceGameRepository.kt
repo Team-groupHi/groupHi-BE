@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
 @Service
-class BalanceGameRepository( //TODO: DataHandler?
+class BalanceGameRepository( //TODO: 해당 레이어 네이밍 고민 필요
     private val redisTemplate: RedisTemplate<String, Any>,
     private val balanceGameContentRepository: BalanceGameContentRepository
-) { //TODO: 키값 상수화, 서비스 로직과 책임 명확히 나누어 가지도록 리팩터링하기
+) { //TODO: 키값 상수화
 
     fun init(roomId: String, theme: BalanceGameTheme, totalRounds: Int) {
         // 라운드 세팅
