@@ -88,13 +88,15 @@ class QnaGameService(
                 QnaGameResultGetResponse(
                     round = idx + 1,
                     question = question,
-                    result = answers.map { answer ->
-                        QnaGameAnswerResponse(
-                            name = answer.name,
-                            answer = answer.answer,
-                            likes = answer.likes
-                        )
-                    }
+                    result = answers
+                        .sortedByDescending { it.likes }
+                        .map {
+                            QnaGameAnswerResponse(
+                                name = it.name,
+                                answer = it.answer,
+                                likes = it.likes
+                            )
+                        }
                 )
             }
         } else {
@@ -102,13 +104,15 @@ class QnaGameService(
                 QnaGameResultGetResponse(
                     round = round,
                     question = questions[round - 1],
-                    result = qnaGameRepository.getAnswersByRound(roomId, round).map { answer ->
-                        QnaGameAnswerResponse(
-                            name = answer.name,
-                            answer = answer.answer,
-                            likes = answer.likes
-                        )
-                    }
+                    result = qnaGameRepository.getAnswersByRound(roomId, round)
+                        .sortedByDescending { it.likes }
+                        .map {
+                            QnaGameAnswerResponse(
+                                name = it.name,
+                                answer = it.answer,
+                                likes = it.likes
+                            )
+                        }
                 )
             )
         }
