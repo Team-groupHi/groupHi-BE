@@ -41,6 +41,10 @@ class PlayerRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         }
     }
 
+    fun getPlayerNamesByRoomId(roomId: String): List<String> {
+        return redisTemplate.opsForHash<String, Boolean>().keys("$roomId:players").toList()
+    }
+
     fun save(roomId: String, player: Player): Player {
         redisTemplate.opsForHash<String, Boolean>().put("$roomId:players", player.name, player.isReady)
 
