@@ -19,4 +19,13 @@ enum class MessageType {
     BG_NEXT,
     BG_ALL_RESULTS,
     BG_END,
+
+    // QnaGame
+    QNA_START,
+    QNA_SUBMIT,
+    QNA_LIKE,
+    QNA_UNLIKE,
+    QNA_NEXT,
+    QNA_ALL_RESULTS,
+    QNA_END
 }
