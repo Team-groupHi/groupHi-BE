@@ -15,7 +15,7 @@ class MessageExceptionHandler(private val messagingTemplate: SimpMessageSendingO
 
     @MessageExceptionHandler
     fun handleMessageException(e: MessageException, headerAccessor: SimpMessageHeaderAccessor) {
-        print("🚨 $e")
+        println("🚨 $e")
         val userId = headerAccessor.user?.name ?: return
         messagingTemplate.convertAndSendToUser(
             userId,
@@ -30,7 +30,7 @@ class MessageExceptionHandler(private val messagingTemplate: SimpMessageSendingO
 
     @MessageExceptionHandler
     fun handleException(e: Exception, headerAccessor: SimpMessageHeaderAccessor) {
-        print("🚨 $e")
+        println("🚨 $e")
         e.printStackTrace()
         val userId = headerAccessor.user?.name ?: return
         return messagingTemplate.convertAndSendToUser(
