@@ -6,6 +6,7 @@ import com.groupHi.groupHi.domain.room.dto.request.RoomGameChangeRequest
 import com.groupHi.groupHi.domain.room.dto.request.RoomPlayerNameChangeRequest
 import com.groupHi.groupHi.domain.room.service.RoomService
 import com.groupHi.groupHi.global.annotation.CurrentPlayer
+import com.groupHi.groupHi.global.annotation.HostOnly
 import com.groupHi.groupHi.global.annotation.PlayerSession
 import com.groupHi.groupHi.global.dto.MessageType
 import com.groupHi.groupHi.global.dto.response.MessageResponse
@@ -102,17 +103,17 @@ class RoomMessageController(
     }
 
     @MessageMapping("/rooms/change-game")
+    @HostOnly
     fun changeGame(
         @Payload request: RoomGameChangeRequest,
         @CurrentPlayer player: PlayerSession
     ) {
         val roomId = player.roomId
-        val name = player.name
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.CHANGE_GAME,
-                content = roomService.changeGame(roomId, name, request.gameId)
+                content = roomService.changeGame(roomId, request.gameId)
             )
         )
     }
