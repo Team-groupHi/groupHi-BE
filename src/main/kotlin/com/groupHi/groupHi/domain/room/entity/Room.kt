@@ -4,5 +4,5 @@ data class Room(
     val id: String,
     val status: RoomStatus,
     val gameId: String,
-    val hostName: String? = null, //TODO: 삭제
+    val hostName: String? = null
 )

@@ -16,7 +16,7 @@ class BalanceGameRepository( //TODO: 해당 레이어 네이밍 고민 필요
         // 라운드 세팅
         redisTemplate.opsForValue().set("bg:$roomId:rounds", "0/$totalRounds")
         // 컨텐츠 세팅
-        val contents = if (theme == BalanceGameTheme.ALL || theme == BalanceGameTheme.GENERAL) { //TODO: GENERAL 조건문 삭제
+        val contents = if (theme == BalanceGameTheme.ALL) {
             balanceGameContentRepository.findAll().shuffled().take(totalRounds)
         } else {
             balanceGameContentRepository.findByTheme(theme).shuffled().take(totalRounds)

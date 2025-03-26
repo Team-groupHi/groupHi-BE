@@ -47,7 +47,6 @@ class RoomService(
         return RoomResponse(
             id = room.id,
             status = room.status,
-            hostName = room.hostName,
             game = GameGetResponse.from(game),
             players = players.stream()
                 .map { PlayerResponse.from(it) }
@@ -100,13 +99,10 @@ class RoomService(
         playerRepository.updateReady(roomId, name, false)
     }
 
-    fun changeGame(roomId: String, name: String, gameId: String): GameGetResponse {
+    fun changeGame(roomId: String, gameId: String): GameGetResponse {
         val room = roomRepository.findById(roomId)
             ?: throw MessageException(ErrorCode.ROOM_NOT_FOUND)
 
-        if (!room.hostName.equals(name)) {
-            throw MessageException(ErrorCode.ONLY_HOST_CAN_CHANGE_GAME)
-        }
         if (room.status == RoomStatus.PLAYING) {
             throw MessageException(ErrorCode.ALREADY_PLAYING)
         }
@@ -145,12 +141,9 @@ class RoomService(
         }
     }
 
-    fun validateStartable(roomId: String, name: String, totalRounds: Int) {
+    fun validateStartable(roomId: String, totalRounds: Int) {
         val room = getRoom(roomId)
 
-        if (room.hostName != name) {
-            throw MessageException(ErrorCode.ONLY_HOST_CAN_START)
-        }
         if (room.players.size < 2) {
             throw MessageException(ErrorCode.NOT_ENOUGH_PLAYERS)
         }

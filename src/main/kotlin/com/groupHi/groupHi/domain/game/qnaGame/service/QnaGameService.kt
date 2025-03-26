@@ -21,8 +21,8 @@ class QnaGameService(
     private val qnaGameRepository: QnaGameRepository
 ) {
 
-    fun start(roomId: String, name: String, theme: BalanceGameTheme, totalRounds: Int): QnaGameRoundResponse {
-        roomService.validateStartable(roomId, name, totalRounds)
+    fun start(roomId: String, theme: BalanceGameTheme, totalRounds: Int): QnaGameRoundResponse {
+        roomService.validateStartable(roomId, totalRounds)
         roomRepository.updateRoomStatus(roomId, RoomStatus.PLAYING)
         qnaGameRepository.init(roomId, theme, totalRounds)
         qnaGameRepository.increaseRound(roomId)
@@ -47,12 +47,7 @@ class QnaGameService(
         qnaGameRepository.unlike(roomId, name, round)
     }
 
-    fun next(roomId: String, name: String): QnaGameRoundResponse {
-        val room = roomService.getRoom(roomId)
-        if (room.hostName != name) {
-            throw MessageException(ErrorCode.ONLY_HOST_CAN_NEXT)
-        }
-
+    fun next(roomId: String): QnaGameRoundResponse {
         qnaGameRepository.increaseRound(roomId)
 
         val rounds = qnaGameRepository.getRounds(roomId)
@@ -69,12 +64,7 @@ class QnaGameService(
         return rounds.currentRound >= rounds.totalRounds
     }
 
-    fun end(roomId: String, name: String) {
-        val room = roomService.getRoom(roomId)
-        if (room.hostName != name) {
-            throw MessageException(ErrorCode.ONLY_HOST_CAN_END)
-        }
-
+    fun end(roomId: String) {
         playerRepository.resetReady(roomId)
         roomRepository.updateRoomStatus(roomId, RoomStatus.WAITING)
         qnaGameRepository.clean(roomId)
