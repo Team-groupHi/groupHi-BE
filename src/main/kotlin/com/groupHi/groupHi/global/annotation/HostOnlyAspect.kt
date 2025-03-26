@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 @Aspect
 @Component
 class HostOnlyAspect(private val roomRepository: RoomRepository) {
-    @Around("@annotation(HostOnly) && args(.., sessionInfo: SessionInfo)")
+    @Around("@annotation(HostOnly) && args(.., playerSession)")
     fun checkHost(joinPoint: ProceedingJoinPoint, playerSession: PlayerSession): Any? {
         val isHost = roomRepository.isHost(playerSession.roomId, playerSession.name)
         if (!isHost) {
