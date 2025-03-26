@@ -10,8 +10,6 @@ import com.groupHi.groupHi.domain.room.entity.RoomStatus
 import com.groupHi.groupHi.domain.room.repository.PlayerRepository
 import com.groupHi.groupHi.domain.room.repository.RoomRepository
 import com.groupHi.groupHi.domain.room.service.RoomService
-import com.groupHi.groupHi.global.exception.error.ErrorCode
-import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -23,8 +21,8 @@ class BalanceGameService(
     private val balanceGameRepository: BalanceGameRepository
 ) {
 
-    fun start(roomId: String, name: String, theme: BalanceGameTheme, totalRounds: Int): BalanceGameRoundResponse {
-        roomService.validateStartable(roomId, name, totalRounds)
+    fun start(roomId: String, theme: BalanceGameTheme, totalRounds: Int): BalanceGameRoundResponse {
+        roomService.validateStartable(roomId, totalRounds)
         roomRepository.updateRoomStatus(roomId, RoomStatus.PLAYING)
         balanceGameRepository.init(roomId, theme, totalRounds)
         balanceGameRepository.increaseRound(roomId)
@@ -54,12 +52,7 @@ class BalanceGameService(
         return rounds.currentRound >= rounds.totalRounds
     }
 
-    fun next(roomId: String, name: String): BalanceGameRoundResponse {
-        val room = roomService.getRoom(roomId)
-        if (room.hostName != name) {
-            throw MessageException(ErrorCode.ONLY_HOST_CAN_NEXT)
-        }
-
+    fun next(roomId: String): BalanceGameRoundResponse {
         balanceGameRepository.increaseRound(roomId)
 
         val rounds = balanceGameRepository.getRounds(roomId)
@@ -75,12 +68,7 @@ class BalanceGameService(
         )
     }
 
-    fun end(roomId: String, name: String) {
-        val room = roomService.getRoom(roomId)
-        if (room.hostName != name) {
-            throw MessageException(ErrorCode.ONLY_HOST_CAN_END)
-        }
-
+    fun end(roomId: String) {
         playerRepository.resetReady(roomId)
         roomRepository.updateRoomStatus(roomId, RoomStatus.WAITING)
         balanceGameRepository.clean(roomId)

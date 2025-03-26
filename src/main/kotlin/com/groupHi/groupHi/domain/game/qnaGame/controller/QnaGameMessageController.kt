@@ -5,6 +5,7 @@ import com.groupHi.groupHi.domain.game.qnaGame.dto.request.QnaGameStartRequest
 import com.groupHi.groupHi.domain.game.qnaGame.dto.request.QnaGameSubmitRequest
 import com.groupHi.groupHi.domain.game.qnaGame.service.QnaGameService
 import com.groupHi.groupHi.global.annotation.CurrentPlayer
+import com.groupHi.groupHi.global.annotation.HostOnly
 import com.groupHi.groupHi.global.annotation.PlayerSession
 import com.groupHi.groupHi.global.dto.MessageType
 import com.groupHi.groupHi.global.dto.response.MessageResponse
@@ -19,18 +20,19 @@ class QnaGameMessageController(
     private val qnaGameService: QnaGameService
 ) {
 
+
     @MessageMapping("/games/qna-game/start")
+    @HostOnly
     fun start(
         @Payload request: QnaGameStartRequest,
         @CurrentPlayer player: PlayerSession
     ) {
         val roomId = player.roomId
-        val name = player.name
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.QNA_START,
-                content = qnaGameService.start(roomId, name, BalanceGameTheme.CLASSIC, request.totalRounds)
+                content = qnaGameService.start(roomId, BalanceGameTheme.CLASSIC, request.totalRounds)
             )
         )
     }
@@ -87,9 +89,9 @@ class QnaGameMessageController(
     }
 
     @MessageMapping("/games/qna-game/next")
+    @HostOnly
     fun next(@CurrentPlayer player: PlayerSession) {
         val roomId = player.roomId
-        val name = player.name
 
         if (qnaGameService.isFinished(roomId)) {
             messagingTemplate.convertAndSend(
@@ -103,16 +105,16 @@ class QnaGameMessageController(
             "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.QNA_NEXT,
-                content = qnaGameService.next(roomId, name)
+                content = qnaGameService.next(roomId)
             )
         )
     }
 
     @MessageMapping("/games/qna-game/end")
+    @HostOnly
     fun end(@CurrentPlayer player: PlayerSession) {
         val roomId = player.roomId
-        val name = player.name
-        qnaGameService.end(roomId, name)
+        qnaGameService.end(roomId)
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
             MessageResponse(MessageType.QNA_END)

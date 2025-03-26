@@ -142,12 +142,9 @@ class RoomService(
         }
     }
 
-    fun validateStartable(roomId: String, name: String, totalRounds: Int) {
+    fun validateStartable(roomId: String, totalRounds: Int) {
         val room = getRoom(roomId)
 
-        if (room.hostName != name) {
-            throw MessageException(ErrorCode.ONLY_HOST_CAN_START)
-        }
         if (room.players.size < 2) {
             throw MessageException(ErrorCode.NOT_ENOUGH_PLAYERS)
         }

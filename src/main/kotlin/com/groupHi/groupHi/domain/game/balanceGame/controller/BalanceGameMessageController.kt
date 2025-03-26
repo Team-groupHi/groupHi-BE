@@ -5,6 +5,7 @@ import com.groupHi.groupHi.domain.game.balanceGame.dto.request.BalanceGameSelect
 import com.groupHi.groupHi.domain.game.balanceGame.dto.request.BalanceGameStartRequest
 import com.groupHi.groupHi.domain.game.balanceGame.service.BalanceGameService
 import com.groupHi.groupHi.global.annotation.CurrentPlayer
+import com.groupHi.groupHi.global.annotation.HostOnly
 import com.groupHi.groupHi.global.annotation.PlayerSession
 import com.groupHi.groupHi.global.dto.MessageType
 import com.groupHi.groupHi.global.dto.response.MessageResponse
@@ -20,17 +21,17 @@ class BalanceGameMessageController(
 ) {
 
     @MessageMapping("/games/balance-game/start")
+    @HostOnly
     fun start(
         @Payload request: BalanceGameStartRequest,
         @CurrentPlayer player: PlayerSession
     ) {
         val roomId = player.roomId
-        val name = player.name
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_START,
-                content = balanceGameService.start(roomId, name, request.theme, request.totalRounds)
+                content = balanceGameService.start(roomId, request.theme, request.totalRounds)
             )
         )
     }
@@ -87,9 +88,9 @@ class BalanceGameMessageController(
     }
 
     @MessageMapping("/games/balance-game/next")
+    @HostOnly
     fun next(@CurrentPlayer player: PlayerSession) {
         val roomId = player.roomId
-        val name = player.name
 
         if (balanceGameService.isFinished(roomId)) {
             messagingTemplate.convertAndSend(
@@ -103,16 +104,16 @@ class BalanceGameMessageController(
             "/topic/rooms/$roomId",
             MessageResponse(
                 type = MessageType.BG_NEXT,
-                content = balanceGameService.next(roomId, name)
+                content = balanceGameService.next(roomId)
             )
         )
     }
 
     @MessageMapping("/games/balance-game/end")
+    @HostOnly
     fun end(@CurrentPlayer player: PlayerSession) {
         val roomId = player.roomId
-        val name = player.name
-        balanceGameService.end(roomId, name)
+        balanceGameService.end(roomId)
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
             MessageResponse(MessageType.BG_END)
