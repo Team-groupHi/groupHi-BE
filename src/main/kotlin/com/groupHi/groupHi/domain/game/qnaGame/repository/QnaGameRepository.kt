@@ -43,12 +43,12 @@ class QnaGameRepository(
         redisTemplate.opsForHash<String, String>().put("qna:$roomId:answers", "$name:$round", answer)
     }
 
-    fun like(roomId: String, name: String, round: Int) {
-        redisTemplate.opsForHash<String, Long>().increment("qna:$roomId:likes", "$name:$round", 1)
+    fun like(roomId: String, round: Int, receiver: String) {
+        redisTemplate.opsForHash<String, Long>().increment("qna:$roomId:likes", "$receiver:$round", 1)
     }
 
-    fun unlike(roomId: String, name: String, round: Int) {
-        redisTemplate.opsForHash<String, Long>().increment("qna:$roomId:likes", "$name:$round", -1)
+    fun unlike(roomId: String, round: Int, receiver: String) {
+        redisTemplate.opsForHash<String, Long>().increment("qna:$roomId:likes", "$receiver:$round", -1)
     }
 
     fun clean(roomId: String) {

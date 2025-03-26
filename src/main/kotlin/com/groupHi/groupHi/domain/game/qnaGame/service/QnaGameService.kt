@@ -9,8 +9,6 @@ import com.groupHi.groupHi.domain.room.entity.RoomStatus
 import com.groupHi.groupHi.domain.room.repository.PlayerRepository
 import com.groupHi.groupHi.domain.room.repository.RoomRepository
 import com.groupHi.groupHi.domain.room.service.RoomService
-import com.groupHi.groupHi.global.exception.error.ErrorCode
-import com.groupHi.groupHi.global.exception.exception.MessageException
 import org.springframework.stereotype.Service
 
 @Service
@@ -39,12 +37,12 @@ class QnaGameService(
         qnaGameRepository.submit(roomId, name, round, answer)
     }
 
-    fun like(roomId: String, name: String, round: Int) {
-        qnaGameRepository.like(roomId, name, round)
+    fun like(roomId: String, round: Int, receiver: String) {
+        qnaGameRepository.like(roomId, round, receiver)
     }
 
-    fun unlike(roomId: String, name: String, round: Int) {
-        qnaGameRepository.unlike(roomId, name, round)
+    fun unlike(roomId: String, round: Int, receiver: String) {
+        qnaGameRepository.unlike(roomId, round, receiver)
     }
 
     fun next(roomId: String): QnaGameRoundResponse {

@@ -1,8 +1,10 @@
 package com.groupHi.groupHi.domain.game.qnaGame.controller
 
 import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameTheme
+import com.groupHi.groupHi.domain.game.qnaGame.dto.request.QnaGameLikeRequest
 import com.groupHi.groupHi.domain.game.qnaGame.dto.request.QnaGameStartRequest
 import com.groupHi.groupHi.domain.game.qnaGame.dto.request.QnaGameSubmitRequest
+import com.groupHi.groupHi.domain.game.qnaGame.dto.request.QnaGameUnlikeRequest
 import com.groupHi.groupHi.domain.game.qnaGame.service.QnaGameService
 import com.groupHi.groupHi.global.annotation.CurrentPlayer
 import com.groupHi.groupHi.global.annotation.HostOnly
@@ -56,12 +58,12 @@ class QnaGameMessageController(
 
     @MessageMapping("/games/qna-game/like")
     fun like(
-        @Payload request: QnaGameSubmitRequest,
+        @Payload request: QnaGameLikeRequest,
         @CurrentPlayer player: PlayerSession
     ) {
         val roomId = player.roomId
         val name = player.name
-        qnaGameService.like(roomId, name, request.round)
+        qnaGameService.like(roomId, request.round, request.receiver)
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
             MessageResponse(
@@ -73,12 +75,12 @@ class QnaGameMessageController(
 
     @MessageMapping("/games/qna-game/unlike")
     fun unlike(
-        @Payload request: QnaGameSubmitRequest,
+        @Payload request: QnaGameUnlikeRequest,
         @CurrentPlayer player: PlayerSession
     ) {
         val roomId = player.roomId
         val name = player.name
-        qnaGameService.unlike(roomId, name, request.round)
+        qnaGameService.unlike(roomId, request.round, request.receiver)
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
             MessageResponse(
