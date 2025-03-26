@@ -27,10 +27,10 @@ class WebSocketConfig(
     }
 
     override fun configureMessageBroker(registry: MessageBrokerRegistry) {
-        registry.enableSimpleBroker("/sub", "/topic", "/queue") //TODO: sub 삭제
+        registry.enableSimpleBroker("/topic", "/queue")
             .setHeartbeatValue(longArrayOf(10000, 10000))
             .setTaskScheduler(taskScheduler())
-        registry.setApplicationDestinationPrefixes("/pub", "/app") //TODO: pub 삭제
+        registry.setApplicationDestinationPrefixes("/app")
         registry.setUserDestinationPrefix("/user")
     }
 

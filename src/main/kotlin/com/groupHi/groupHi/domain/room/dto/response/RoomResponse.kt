@@ -6,7 +6,6 @@ import com.groupHi.groupHi.domain.room.entity.RoomStatus
 data class RoomResponse(
     val id: String,
     val status: RoomStatus,
-    val hostName: String?, //TODO: 삭제
     val game: GameGetResponse,
     val players: List<PlayerResponse>
 )

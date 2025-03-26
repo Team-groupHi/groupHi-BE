@@ -47,7 +47,6 @@ class RoomService(
         return RoomResponse(
             id = room.id,
             status = room.status,
-            hostName = room.hostName,
             game = GameGetResponse.from(game),
             players = players.stream()
                 .map { PlayerResponse.from(it) }
