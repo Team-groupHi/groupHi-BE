@@ -4,11 +4,12 @@ import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameTheme
 import com.groupHi.groupHi.domain.game.qnaGame.dto.request.QnaGameStartRequest
 import com.groupHi.groupHi.domain.game.qnaGame.dto.request.QnaGameSubmitRequest
 import com.groupHi.groupHi.domain.game.qnaGame.service.QnaGameService
+import com.groupHi.groupHi.global.annotation.CurrentPlayer
+import com.groupHi.groupHi.global.annotation.PlayerSession
 import com.groupHi.groupHi.global.dto.MessageType
 import com.groupHi.groupHi.global.dto.response.MessageResponse
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor
 import org.springframework.messaging.simp.SimpMessageSendingOperations
 import org.springframework.stereotype.Controller
 
@@ -20,11 +21,11 @@ class QnaGameMessageController(
 
     @MessageMapping("/games/qna-game/start")
     fun start(
-        headerAccessor: SimpMessageHeaderAccessor,
-        @Payload request: QnaGameStartRequest
+        @Payload request: QnaGameStartRequest,
+        @CurrentPlayer player: PlayerSession
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
-        val name = headerAccessor.sessionAttributes?.get("name") as String
+        val roomId = player.roomId
+        val name = player.name
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
             MessageResponse(
@@ -36,11 +37,11 @@ class QnaGameMessageController(
 
     @MessageMapping("/games/qna-game/submit")
     fun submit(
-        headerAccessor: SimpMessageHeaderAccessor,
-        @Payload request: QnaGameSubmitRequest
+        @Payload request: QnaGameSubmitRequest,
+        @CurrentPlayer player: PlayerSession
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
-        val name = headerAccessor.sessionAttributes?.get("name") as String
+        val roomId = player.roomId
+        val name = player.name
         qnaGameService.submit(roomId, name, request.round, request.answer)
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
@@ -53,11 +54,11 @@ class QnaGameMessageController(
 
     @MessageMapping("/games/qna-game/like")
     fun like(
-        headerAccessor: SimpMessageHeaderAccessor,
-        @Payload request: QnaGameSubmitRequest
+        @Payload request: QnaGameSubmitRequest,
+        @CurrentPlayer player: PlayerSession
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
-        val name = headerAccessor.sessionAttributes?.get("name") as String
+        val roomId = player.roomId
+        val name = player.name
         qnaGameService.like(roomId, name, request.round)
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
@@ -70,11 +71,11 @@ class QnaGameMessageController(
 
     @MessageMapping("/games/qna-game/unlike")
     fun unlike(
-        headerAccessor: SimpMessageHeaderAccessor,
-        @Payload request: QnaGameSubmitRequest
+        @Payload request: QnaGameSubmitRequest,
+        @CurrentPlayer player: PlayerSession
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
-        val name = headerAccessor.sessionAttributes?.get("name") as String
+        val roomId = player.roomId
+        val name = player.name
         qnaGameService.unlike(roomId, name, request.round)
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
@@ -86,9 +87,9 @@ class QnaGameMessageController(
     }
 
     @MessageMapping("/games/qna-game/next")
-    fun next(headerAccessor: SimpMessageHeaderAccessor) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
-        val name = headerAccessor.sessionAttributes?.get("name") as String
+    fun next(@CurrentPlayer player: PlayerSession) {
+        val roomId = player.roomId
+        val name = player.name
 
         if (qnaGameService.isFinished(roomId)) {
             messagingTemplate.convertAndSend(
@@ -108,9 +109,9 @@ class QnaGameMessageController(
     }
 
     @MessageMapping("/games/qna-game/end")
-    fun end(headerAccessor: SimpMessageHeaderAccessor) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
-        val name = headerAccessor.sessionAttributes?.get("name") as String
+    fun end(@CurrentPlayer player: PlayerSession) {
+        val roomId = player.roomId
+        val name = player.name
         qnaGameService.end(roomId, name)
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",

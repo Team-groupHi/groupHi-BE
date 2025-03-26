@@ -4,27 +4,28 @@ import com.groupHi.groupHi.domain.game.balanceGame.BalanceGameSelection
 import com.groupHi.groupHi.domain.game.balanceGame.dto.request.BalanceGameSelectRequest
 import com.groupHi.groupHi.domain.game.balanceGame.dto.request.BalanceGameStartRequest
 import com.groupHi.groupHi.domain.game.balanceGame.service.BalanceGameService
+import com.groupHi.groupHi.global.annotation.CurrentPlayer
+import com.groupHi.groupHi.global.annotation.PlayerSession
 import com.groupHi.groupHi.global.dto.MessageType
 import com.groupHi.groupHi.global.dto.response.MessageResponse
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor
 import org.springframework.messaging.simp.SimpMessageSendingOperations
 import org.springframework.stereotype.Controller
 
 @Controller
-class BalanceGameMessageController( //TODO: refactor
+class BalanceGameMessageController(
     private val messagingTemplate: SimpMessageSendingOperations,
     private val balanceGameService: BalanceGameService
 ) {
 
     @MessageMapping("/games/balance-game/start")
     fun start(
-        headerAccessor: SimpMessageHeaderAccessor,
-        @Payload request: BalanceGameStartRequest
+        @Payload request: BalanceGameStartRequest,
+        @CurrentPlayer player: PlayerSession
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
-        val name = headerAccessor.sessionAttributes?.get("name") as String
+        val roomId = player.roomId
+        val name = player.name
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
             MessageResponse(
@@ -36,11 +37,11 @@ class BalanceGameMessageController( //TODO: refactor
 
     @MessageMapping("/games/balance-game/select-a")
     fun selectA(
-        headerAccessor: SimpMessageHeaderAccessor,
-        @Payload request: BalanceGameSelectRequest
+        @Payload request: BalanceGameSelectRequest,
+        @CurrentPlayer player: PlayerSession
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
-        val name = headerAccessor.sessionAttributes?.get("name") as String
+        val roomId = player.roomId
+        val name = player.name
         balanceGameService.select(roomId, name, request.currentRound, BalanceGameSelection.A)
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
@@ -53,11 +54,11 @@ class BalanceGameMessageController( //TODO: refactor
 
     @MessageMapping("/games/balance-game/select-b")
     fun selectB(
-        headerAccessor: SimpMessageHeaderAccessor,
-        @Payload request: BalanceGameSelectRequest
+        @Payload request: BalanceGameSelectRequest,
+        @CurrentPlayer player: PlayerSession
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
-        val name = headerAccessor.sessionAttributes?.get("name") as String
+        val roomId = player.roomId
+        val name = player.name
         balanceGameService.select(roomId, name, request.currentRound, BalanceGameSelection.B)
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
@@ -70,11 +71,11 @@ class BalanceGameMessageController( //TODO: refactor
 
     @MessageMapping("/games/balance-game/unselect")
     fun unselect(
-        headerAccessor: SimpMessageHeaderAccessor,
-        @Payload request: BalanceGameSelectRequest
+        @Payload request: BalanceGameSelectRequest,
+        @CurrentPlayer player: PlayerSession
     ) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
-        val name = headerAccessor.sessionAttributes?.get("name") as String
+        val roomId = player.roomId
+        val name = player.name
         balanceGameService.unselect(roomId, name, request.currentRound)
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
@@ -86,9 +87,9 @@ class BalanceGameMessageController( //TODO: refactor
     }
 
     @MessageMapping("/games/balance-game/next")
-    fun next(headerAccessor: SimpMessageHeaderAccessor) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
-        val name = headerAccessor.sessionAttributes?.get("name") as String
+    fun next(@CurrentPlayer player: PlayerSession) {
+        val roomId = player.roomId
+        val name = player.name
 
         if (balanceGameService.isFinished(roomId)) {
             messagingTemplate.convertAndSend(
@@ -108,9 +109,9 @@ class BalanceGameMessageController( //TODO: refactor
     }
 
     @MessageMapping("/games/balance-game/end")
-    fun end(headerAccessor: SimpMessageHeaderAccessor) {
-        val roomId = headerAccessor.sessionAttributes?.get("roomId") as String
-        val name = headerAccessor.sessionAttributes?.get("name") as String
+    fun end(@CurrentPlayer player: PlayerSession) {
+        val roomId = player.roomId
+        val name = player.name
         balanceGameService.end(roomId, name)
         messagingTemplate.convertAndSend(
             "/topic/rooms/$roomId",
