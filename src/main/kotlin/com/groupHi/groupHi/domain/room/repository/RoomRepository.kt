@@ -35,7 +35,8 @@ class RoomRepository(private val redisTemplate: RedisTemplate<String, Any>) {
         return Room(
             id = id,
             status = room["status"] as RoomStatus,
-            gameId = room["gameId"] as String
+            gameId = room["gameId"] as String,
+            hostName = room["hostName"] as String?
         )
     }
 
